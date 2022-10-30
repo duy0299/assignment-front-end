@@ -1,2 +1,3 @@
-# assignment-front-end
- front end of assignment
+# Description
+
+    Build React Ecommerce Web Shop
