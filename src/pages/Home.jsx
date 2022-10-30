@@ -55,25 +55,25 @@ const Home = () => {
                     Top sản phẩm bán chạy trong tuần
                 </SectionTitle>
                 <SectionBody>
-                <Grid 
-                    col={5}
-                    mdCol={2}
-                    smCol={1}
-                    gap={20}
-                >
-                    {
-                        productData.getProducts(5).map((item, index)=>(
-                            <ProductCard
-                                key={index}
-                                img01= {item.image01}
-                                img02={item.image02}
-                                name={item.title}
-                                price={item.price}
-                                slug={item.slug}
-                            />
-                        ))
-                    }
-                </Grid>
+                    <Grid 
+                        col={5}
+                        mdCol={2}
+                        smCol={1}
+                        gap={20}
+                    >
+                        {
+                            productData.getProducts(5).map((item, index)=>(
+                                <ProductCard
+                                    key={index}
+                                    img01= {item.image01}
+                                    img02={item.image02}
+                                    name={item.title}
+                                    price={item.price}
+                                    slug={item.slug}
+                                />
+                            ))
+                        }
+                    </Grid>
                 </SectionBody>
             </Section>
 
@@ -83,25 +83,25 @@ const Home = () => {
                     Sản phẩm mới
                 </SectionTitle>
                 <SectionBody>
-                <Grid 
-                    col={5}
-                    mdCol={2}
-                    smCol={1}
-                    gap={20}
-                >
-                    {
-                        productData.getProducts(10).map((item, index)=>(
-                            <ProductCard
-                                key={index}
-                                img01= {item.image01}
-                                img02={item.image02}
-                                name={item.title}
-                                price={item.price}
-                                slug={item.slug}
-                            />
-                        ))
-                    }
-                </Grid>
+                    <Grid 
+                        col={5}
+                        mdCol={2}
+                        smCol={1}
+                        gap={20}
+                    >
+                        {
+                            productData.getProducts(10).map((item, index)=>(
+                                <ProductCard
+                                    key={index}
+                                    img01= {item.image01}
+                                    img02={item.image02}
+                                    name={item.title}
+                                    price={item.price}
+                                    slug={item.slug}
+                                />
+                            ))
+                        }
+                    </Grid>
                 </SectionBody>
             </Section>
 
