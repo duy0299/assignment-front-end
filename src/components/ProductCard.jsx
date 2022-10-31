@@ -18,7 +18,7 @@ const ProductCard = props => {
 
     return (
         <div className="product-card">
-            <Link to={`/catalog/${props.slug}`}>
+            <Link to={`/product/${props.slug}`}>
                 <div className="product-card__image">
                     <img src={props.img01} alt="" />
                     <img src={props.img02} alt="" />

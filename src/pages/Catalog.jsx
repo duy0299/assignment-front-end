@@ -10,7 +10,6 @@ import Button from '../components/Button'
 import InfinityList from '../components/InfinityList'
 
 const Catalog = () => {
-
     const initFilter = {
         category: [],
         size: []

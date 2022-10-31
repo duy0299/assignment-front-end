@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 
@@ -7,7 +7,7 @@ const Helmet = props => {
 
     document.title = 'jeulia - ' + props.title
 
-    React.useEffect(() => {
+    useEffect(() => {
         window.scrollTo(0,0)
     }, [])
 
