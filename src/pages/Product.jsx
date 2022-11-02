@@ -5,10 +5,8 @@ import Helmet from '../components/Helmet'
 import ProductCard from '../components/ProductCard'
 import Section, { SectionTitle, SectionBody } from '../components/Section'
 
-import productData from '../assets/fake-data/products'
 import ProductView from '../components/ProductView'
 import productModelService  from '../service/productModelService'
-import isCurrentMonth from '../utils/isCurrentMonth'
 import FormReview from '../components/FormReview'
 import { useParams } from 'react-router-dom'
 
@@ -17,7 +15,7 @@ import { useParams } from 'react-router-dom'
 const Product = props => {
     const [productModel, setProductModel] = useState(undefined);
     const [mostPopularProducts, setMostPopularProducts] = useState(null);
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const params = useParams();
     const loadProductModel = useCallback(
         () => {

@@ -1,7 +1,9 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import { Link, useLocation, useResolvedPath } from 'react-router-dom'
 
 import logo from '../assets/images/Logo-2.png'
+import cookies from '../utils/cookies'
+import Button from './Button'
 
 const mainNav = [
     {
@@ -29,21 +31,24 @@ const Header = (props) => {
     const activeNav = mainNav.findIndex(e=> e.path === pathname)
     const headerRef = useRef(null)
     const menuLeft = useRef(null);
-
-    const menuToggle = () => menuLeft.current.classList.toggle('active')
+    const user = cookies.getUser();
+    const menuToggle = () => {
+        console.log(menuLeft);
+        return menuLeft.current.classList.toggle('active')
+    }
     
-    
+    const scrollhandler = useCallback(() => {
+        if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+            headerRef.current.classList.add('shrink')
+        } else {
+            headerRef.current.classList.remove('shrink')
+        }
+    })
 // hàm dùng khi cuộn màn hình xuống
     useEffect(() => {
-        window.addEventListener("scroll", () => {
-            if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-                headerRef.current.classList.add('shrink')
-            } else {
-                headerRef.current.classList.remove('shrink')
-            }
-        })
+        window.addEventListener("scroll", scrollhandler)
         return () => {
-            window.removeEventListener('scroll')
+            window.removeEventListener('scroll', scrollhandler)
         };
     }, []);
     
@@ -87,9 +92,21 @@ const Header = (props) => {
                                 <i className="bx bx-shopping-bag"></i>
                             </Link>
                         </div>
-                        <div className="header__menu__item header__menu__right__item">
-                            <i className="bx bx-user"></i>
-                        </div>
+                        {
+                            (user === null)
+                            ?
+                            <div className="header__menu__item header__menu__right__item">
+                                <Link to="/login">
+                                    <Button>Đăng nhập</Button>
+                                </Link>
+                            </div>
+                            :
+                            <div className="header__menu__item header__menu__right__item">
+                                <i className="bx bx-user"></i>
+                            </div>
+                        }
+                        
+                        
                     </div>
                 </div>
             </div>

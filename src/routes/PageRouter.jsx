@@ -8,16 +8,23 @@ import Cart     from '../pages/Cart'
 import Product  from '../pages/Product'
 import Layout from '../pages/Layout'
 import Login from '../pages/Login'
+import Register from '../pages/Register'
 
+const HomePage = <Layout><Home/></Layout>;
+const ProductPage = <Layout><Product/></Layout>;
+const RegisterPage = <Layout><Register/></Layout>;
 
 const PageRouter = () => {
+    
+
     return (
         <BrowserRouter>
             <Routes>
-                <Route path='/home' exact element={<Layout><Home/></Layout>}/>
-                <Route path='/' exact element={<Layout><Home/></Layout>}/>
+                <Route path='/home' exact element={HomePage}/>
+                <Route path='/' exact element={HomePage}/>
                 <Route path='/login' exact element={<Login/>}/>
-                <Route path='/product/:id' element={<Layout><Product/></Layout>}/>
+                <Route path='/product/:id' element={ProductPage}/>
+                <Route path='/register' element={RegisterPage}/>
                 {/* <Route path='/catalog' component={Catalog}/> */}
                 {/* <Route path='/cart' component={Cart}/> */}
             </Routes>

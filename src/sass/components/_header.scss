@@ -76,6 +76,11 @@
 
         &__right {
             font-size: 2.25rem;
+            Button{
+                width: 9rem;
+                font-size: 15px;
+                
+            }
 
             &__item {
                 @include flex(center, center);

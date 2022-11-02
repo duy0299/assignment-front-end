@@ -27,7 +27,7 @@ html #loginform{
   border-radius: 25px;
 }
 
-#headerTitle{
+#__headerTitle{
   text-align: center;
   font-family: 'open sans', sans-serif;
   padding: 2rem 0;
@@ -35,7 +35,7 @@ html #loginform{
   font-size: 2rem;
 }
 
-.row{
+.__row{
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,7 +44,7 @@ html #loginform{
   
 }
 
-.row input{
+.__row input{
   width: 80%;
   box-sizing: border-box;
 	border: none;
@@ -55,29 +55,29 @@ html #loginform{
   transition: box-shadow 0.2s ease-in;
 }
 
-.row input:focus{
+.__row input:focus{
    box-shadow: inset 0px -3px 0px 0px rgba(34,193,195,0.7);
    outline: none;
 }
 
-.row input::-webkit-input-placeholder{
+.__row input::-webkit-input-placeholder{
   opacity: 1;
   transition: opacity 0.25s ease-out;
 }
 
-.row input:hover::-webkit-input-placeholder,
-.row input:focus::-webkit-input-placeholder{
+.__row input:hover::-webkit-input-placeholder,
+.__row input:focus::-webkit-input-placeholder{
   opacity: 0;
 }
 
-.row label{
+.__row label{
   align-self: start;
   padding-left: 4.5rem;
   padding-bottom: 0.5rem;
   color: rgba(187,187,187,0.9);
 }
 
-.row button{
+.__row button{
   border-radius: 25px;
   width: 80%;
   height: 40px;
@@ -91,7 +91,7 @@ html #loginform{
   transition: opacity 0.25s ease-out;
 }
 
-.row button:hover{
+.__row button:hover{
   opacity: 0.8;
 }
 

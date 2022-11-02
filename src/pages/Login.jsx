@@ -7,7 +7,7 @@ import Helmet from "../components/Helmet";
 import '../sass/components/login.scss'
 
 import authService from "../service/authService";
-import cookies from '../service/cookies'
+import cookies from '../utils/cookies.js'
 
 const Login = props => {
     return(
@@ -17,7 +17,7 @@ const Login = props => {
                         <Link to='/'>Trở về</Link>
                     </Button>
                     <div id="loginform">
-                        <h2 id="headerTitle">Đăng nhập</h2>
+                        <h2 id="__headerTitle">Đăng nhập</h2>
                         <Form />
                         <OtherMethods />
                     </div>
@@ -68,7 +68,7 @@ const Form = props => {
                         }
                     })} 
                 >
-                    <div class="row">
+                    <div className="__row">
                         <label>email</label>
                         <input 
                             name="email"
@@ -77,7 +77,7 @@ const Form = props => {
                             // onChange={handleChangeEmail}
                         />
                     </div>  
-                    <div class="row">
+                    <div className="__row">
                         <label>password</label>
                         <input 
                             name="password"
@@ -91,7 +91,7 @@ const Form = props => {
             );
 }
 const SubmitButton = props => (
-  <div id="button" class="row">
+  <div id="button" className="__row">
     <button type="submit">{props.value}</button>
   </div>
 );
@@ -105,7 +105,7 @@ const OtherMethods = props => (
       <Twitter />
       <Google />
     </div>
-    <div className="text-register-in-login">
+    <div classNameName="text-register-in-login">
         <Link to='/register'>Đăng ký tài khoản?</Link>
     </div>
   </div>
@@ -113,19 +113,19 @@ const OtherMethods = props => (
 
 const Facebook = props => (
   <a href="#" id="facebookIcon">
-    <i class='bx bxl-facebook' ></i>
+    <i className='bx bxl-facebook' ></i>
   </a>
 );
 
 const Twitter = props => (
   <a href="#" id="twitterIcon">
-    <i class='bx bxl-twitter' ></i>
+    <i className='bx bxl-twitter' ></i>
   </a>
 );
 
 const Google = props => (
   <a href="#" id="googleIcon">
-    <i class='bx bxl-google'></i>
+    <i className='bx bxl-google'></i>
   </a>
 );
 

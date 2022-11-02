@@ -14,7 +14,7 @@ import formatVND from '../utils/formatVND'
 
 
 const ProductCard = props => {
-    console.log(props.product);
+    // console.log(props.product);
     const [value, setValue] = useState( props.product.start );
     // console.log(props.product);
     const id        = props.product.id       
