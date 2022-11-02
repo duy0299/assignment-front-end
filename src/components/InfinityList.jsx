@@ -59,14 +59,10 @@ const InfinityList = props => {
                 gap={20}
             >
                 {
-                    data.map((item, index) => (
+                    data.map((item, index)=>(
                         <ProductCard
+                            product={item}
                             key={index}
-                            img01={item.image01}
-                            img02={item.image02}
-                            name={item.title}
-                            price={Number(item.price)}
-                            slug={item.slug}
                         />
                     ))
                 }

@@ -12,9 +12,9 @@ const Routes = () => {
         <Switch>
             <Route path='/' exact component={Home}/>
             <Route path='/home' component={Home}/>
-            <Route path='/product/:slug' component={Product}/>
-            <Route path='/catalog' component={Catalog}/>
-            <Route path='/cart' component={Cart}/>
+            <Route path='/product/:id' component={Product}/>
+            {/* <Route path='/catalog' component={Catalog}/> */}
+            {/* <Route path='/cart' component={Cart}/> */}
         </Switch>
     )
 }

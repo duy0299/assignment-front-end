@@ -43,16 +43,20 @@
         font-size: 1.25rem;
         font-weight: normal;
     }
-
+    
     &__price {
         color: $txt-main-color;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: 600;
         margin-bottom: 10px;
 
         &__old {
             color: $txt-second-color;
             margin-left: 20px;
+            font-weight: 300;
+        }
+        &__save {
+            color: red;
             font-weight: 300;
         }
     }
@@ -62,4 +66,8 @@
             display: none;
         }
     }
+}
+
+.__price-view{
+    font-size: 1.9rem;
 }

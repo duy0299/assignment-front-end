@@ -9,63 +9,66 @@ import size from '../assets/fake-data/product-size'
 import Button from '../components/Button'
 import InfinityList from '../components/InfinityList'
 
+import productModelService  from '../service/productModelService'
+
+
 const Catalog = () => {
     const initFilter = {
         category: [],
         size: []
     }
 
-    const productList = productData.getAllProducts()
-
-    const [products, setProducts] = useState(productList)
+    const [products, setProducts] = useState(()=>{
+        return productModelService.getAll(1);
+    })
 
     const [filter, setFilter] = useState(initFilter)
 
     const filterSelect = (type, checked, item) => {
-        if (checked) {
-            switch(type) {
-                case "CATEGORY":
-                    setFilter({...filter, category: [...filter.category, item.categorySlug]})
-                    break
-                case "SIZE":
-                    setFilter({...filter, size: [...filter.size, item.size]})
-                    break
-                default:
-            }
-        } else {
-            switch(type) {
-                case "CATEGORY":
-                    const newCategory = filter.category.filter(e => e !== item.categorySlug)
-                    setFilter({...filter, category: newCategory})
-                    break
-                case "SIZE":
-                    const newSize = filter.size.filter(e => e !== item.size)
-                    setFilter({...filter, size: newSize})
-                    break
-                default:
-            }
-        }
+        // if (checked) {
+        //     switch(type) {
+        //         case "CATEGORY":
+        //             setFilter({...filter, category: [...filter.category, item.categorySlug]})
+        //             break
+        //         case "SIZE":
+        //             setFilter({...filter, size: [...filter.size, item.size]})
+        //             break
+        //         default:
+        //     }
+        // } else {
+        //     switch(type) {
+        //         case "CATEGORY":
+        //             const newCategory = filter.category.filter(e => e !== item.categorySlug)
+        //             setFilter({...filter, category: newCategory})
+        //             break
+        //         case "SIZE":
+        //             const newSize = filter.size.filter(e => e !== item.size)
+        //             setFilter({...filter, size: newSize})
+        //             break
+        //         default:
+        //     }
+        // }
     }
 
     const clearFilter = () => setFilter(initFilter)
 
     const updateProducts = useCallback(
         () => {
-            let temp = productList
+            let temp = products
 
-            if (filter.category.length > 0) {
-                temp = temp.filter(e => filter.category.includes(e.categorySlug))
-            }
-            if (filter.size.length > 0) {
-                temp = temp.filter(e => {
-                    const check = e.size.find(size => filter.size.includes(size))
-                    return check !== undefined
-                })
-            }
+            // if (filter.category.length > 0) {
+            //     temp = temp.filter(e => filter.category.includes(e.categorySlug))
+            // }
+            // if (filter.size.length > 0) {
+            //     temp = temp.filter(e => {
+            //         const check = e.size.find(size => filter.size.includes(size))
+            //         return check !== undefined
+            //     })
+            // }
 
             setProducts(temp)
         },
-        [filter, productList],
+        [filter, products],
     )
 
     useEffect(() => {

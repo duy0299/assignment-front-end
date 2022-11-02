@@ -1,33 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-
 import { withRouter } from 'react-router'
 
 import Button from './Button'
+
+
 import numberWithCommas from '../utils/numberWithCommas'
-
+import formatVND from '../utils/formatVND'
 const ProductView = props => {
-
-    let product = props.product
-
-    if (product === undefined) product = {
-        title: "",
-        price: '',
-        image01: null,
-        image02: null,
-        categorySlug: "",
-        slug: "",
-        size: [],
-        description: ""
-    }
-
-    const [previewImg, setPreviewImg] = useState(product.image01)
-
+    let productModel = props.productModel
+    let priceSave = 0;
+    const [previewImg, setPreviewImg] = useState(productModel.listImages[0])
     const [descriptionExpand, setDescriptionExpand] = useState(false)
-
-    const [size, setSize] = useState(undefined)
-
+    const [product, setProduct] = useState(undefined)
     const [quantity, setQuantity] = useState(1)
+    let wishlist  = true;
+    const email = "b@gmail.com"
+    for (const item of productModel.listUserLike ) {
+        if (item === email) {
+            wishlist = true;
+        }
+    }
 
     const updateQuantity = (type) => {
         if (type === 'plus') {
@@ -38,13 +31,17 @@ const ProductView = props => {
     }
 
     useEffect(() => {
-        setPreviewImg(product.image01)
+        setPreviewImg(productModel.listImages[0])
         setQuantity(1)
-        setSize(undefined)
-    }, [product])
+        setProduct(undefined)
+    }, [productModel])
+
+    useEffect(() => {
+       
+    })
 
     const check = () => {
-        if (size === undefined) {
+        if (product === undefined) {
             alert('Vui lòng chọn kích cỡ!')
             return false
         }
@@ -52,43 +49,97 @@ const ProductView = props => {
     }
 
     const addToCart = () => {
-        if (check()) {
-            let newItem = {
-                slug: product.slug,
-                size: size,
-                price: product.price,
-                quantity: quantity
-            }
+        // if (check()) {
+        //     let newItem = {
+        //         slug: productModel.slug,
+        //         product: product,
+        //         price: productModel.price,
+        //         quantity: quantity
+        //     }
             // if (dispatch(addItem(newItem))) {
             //     alert('Success')
             // } else {
             //     alert('Fail')
             // }
-        }
+        // }
     }
 
     const goToCart = () => {
         if (check()) {
-            let newItem = {
-                slug: product.slug,
-                size: size,
-                price: product.price,
-                quantity: quantity
-            }
+            // let newItem = {
+            //     slug: productModel.slug,
+            //     size: size,
+            //     price: productModel.price,
+            //     quantity: quantity
+            // }
             props.history.push('/cart')
         }
     }
+    let ComponentPrice = (props) =>{
+        if(props.currentPrice === undefined){
+            if(props.priceFrom ===  props.priceTo){
+                return (
+                    <div className="product-card__price">
+                        {formatVND(numberWithCommas(props.priceRoot))}
+                    </div>
+                )
+            }else{
+                return (
+                    <div className="product-card__price __price-view">
+                        <span>
+                            {formatVND(numberWithCommas(props.priceFrom))}
+                        </span>
+                        <span> - </span>
+                        <span className="product-card__price __price-view">
+                            {formatVND(numberWithCommas(props.priceTo))}
+                        </span>
+                    </div>
+                )
+            }
+        }else{
+            console.log(props.currentPrice, props.priceRoot, props.priceTo);
+            if(props.currentPrice > props.priceRoot){
+                return (
+                    <div className="product-card__price __price-view">
+                        {formatVND(numberWithCommas(props.priceRoot))}
+                    </div>
+                )
+                
+            }else{
+                return (
+                    <div>
+                        <div className="product-card__price __price-view">
+                            <span>
+                                {formatVND(numberWithCommas(props.currentPrice))}
+                            </span>
+                            <span className="product-card__price__old ">
+                                <del>{numberWithCommas(props.priceRoot)}</del>
+                            </span>
+                        </div>
+                        <div className="product-card__price__save">
+                            <span>
+                                Tiết kiệm: {formatVND(numberWithCommas(props.priceRoot - props.currentPrice))}
+                            </span>
+                        </div>
+                    </div>
+                )
+            }
+        }
+        
+    }
+
 
     return (
         <div className="product">
             <div className="product__images">
                 <div className="product__images__list">
-                    <div className="product__images__list__item" onClick={() => setPreviewImg(product.image01)}>
-                        <img src={product.image01} alt="" />
-                    </div>
-                    <div className="product__images__list__item" onClick={() => setPreviewImg(product.image02)}>
-                        <img src={product.image02} alt="" />
-                    </div>
+                    {
+                        productModel.listImages.map((item, index)=>(
+                            <div className="product__images__list__item" onClick={() => setPreviewImg(item)}>
+                                <img src={item} alt="images" />
+                            </div>
+                        ))
+                    }
                 </div>
                 <div className="product__images__main">
                     <img src={previewImg} alt="" />
@@ -97,7 +148,7 @@ const ProductView = props => {
                     <div className="product-description__title">
                         Chi tiết sản phẩm
                     </div>
-                    <div className="product-description__content" dangerouslySetInnerHTML={{__html: product.description}}></div>
+                    <div className="product-description__content" dangerouslySetInnerHTML={{__html: productModel.description}}></div>
                     <div className="product-description__toggle">
                         <Button size="sm" onClick={() => setDescriptionExpand(!descriptionExpand)}>
                             {
@@ -108,10 +159,22 @@ const ProductView = props => {
                 </div>
             </div>
             <div className="product__info">
-                <h1 className="product__info__title">{product.title}</h1>
+                <h1 className="product__info__title">{productModel.name}</h1>
                 <div className="product__info__item">
                     <span className="product__info__item__price">
-                        {numberWithCommas(product.price)}
+                        {(product!== undefined) ? 
+                        <ComponentPrice priceRoot={productModel.priceRoot} 
+                            priceFrom={productModel.priceFrom} 
+                            priceTo={productModel.priceTo}
+                            currentPrice={product.currentPrice}
+                        />
+                        : 
+                        <ComponentPrice priceRoot={productModel.priceRoot} 
+                                        priceFrom={productModel.priceFrom} 
+                                        priceTo={productModel.priceTo}
+                                        // currentPrice={productModel.currentPrice}
+                                        />}
+                        
                     </span>
                 </div>
                 <div className="product__info__item">
@@ -120,10 +183,10 @@ const ProductView = props => {
                     </div>
                     <div className="product__info__item__list">
                         {
-                            product.size.map((item, index) => (
-                                <div key={index} className={`product__info__item__list__item ${size === item ? 'active' : ''}`} onClick={() => setSize(item)}>
+                            productModel.listProduct.map((item, index) => (
+                                <div key={index} className={`product__info__item__list__item ${(((product!==undefined)?product.size.id:null) === item.size.id) ? 'active' : ''}`} onClick={() => setProduct(item)}>
                                     <span className="product__info__item__list__item__size">
-                                        {item}
+                                        {item.size.name}
                                     </span>
                                 </div>
                             ))
@@ -144,6 +207,9 @@ const ProductView = props => {
                         <div className="product__info__item__quantity__btn" >
                             <i className="bx bx-plus" onClick={()=>updateQuantity('plus')}></i>
                         </div>
+                        <span className= "product__info__item__quantity__favourite">
+                            {(wishlist)?<i class='bx bxs-heart'></i>:<i class='bx bx-heart'></i>}
+                        </span>
                     </div>
                 </div>
                 <div className="product__info__item">
@@ -155,7 +221,7 @@ const ProductView = props => {
                 <div className="product-description__title">
                     Chi tiết sản phẩm
                 </div>
-                <div className="product-description__content" dangerouslySetInnerHTML={{__html: product.description}}></div>
+                <div className="product-description__content" dangerouslySetInnerHTML={{__html: productModel.description}}></div>
                 <div className="product-description__toggle">
                     <Button size="sm" onClick={() => setDescriptionExpand(!descriptionExpand)}>
                         {

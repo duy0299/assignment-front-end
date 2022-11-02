@@ -1,4 +1,4 @@
-import React from 'react'
+import React,  { useCallback, useEffect, useState } from 'react'
 
 import Grid from '../components/Grid'
 import Helmet from '../components/Helmet'
@@ -7,18 +7,71 @@ import Section, { SectionTitle, SectionBody } from '../components/Section'
 
 import productData from '../assets/fake-data/products'
 import ProductView from '../components/ProductView'
+import productModelService  from '../service/productModelService'
+import isCurrentMonth from '../utils/isCurrentMonth'
+import FormReview from '../components/FormReview'
+
 
 
 const Product = props => {
-    const product = productData.getProductBySlug(props.match.params.slug)
-    const relatedProducts = productData.getProducts(8)
+    const [productModel, setProductModel] = useState(undefined);
+    const [mostPopularProducts, setMostPopularProducts] = useState(null);
+    const [loading, setLoading] = useState(false);
+   
+    const loadProductModel = useCallback(
+        () => {
+            productModelService.getById(props.match.params.id)
+            .then(function (response) {
+                console.log(response.data.result);
+                setProductModel(response.data.result)
+            })
+            .catch(function (error) {
+                console.log(error.message);
+                return null
+            });
+        },
+        [props.match.params.id]
+    )
+    const loadMostPopularProducts = useCallback(
+        () => {
+            productModelService.getMostPopularProduct()
+            .then(function (response) {
+                setMostPopularProducts(response.data.result)
+            })
+            .catch(function (error) {
+                console.log(error.message);
+                return null
+            });
+        },
+        []
+    )
+
+
+    useEffect(() => {
+        loadProductModel();
+        loadMostPopularProducts();
+    }, []);    
+
+    useEffect(() => {
+        window.scrollTo(0,0)
+        loadProductModel()
+    }, [loadProductModel, mostPopularProducts])
+
+
+
+
     
-    
+
     return (
-        <Helmet title= {(product !== undefined)?product.title:'không tìm thấy sản phẩm'}>
+        <Helmet title= {(productModel !== undefined)?productModel.name:'không tìm thấy sản phẩm'}>
             <Section>
                 <SectionBody>
-                    {(product !== undefined)?<ProductView product={product}/>:<h3>Không tìm thấy sản phẩm</h3>}
+                    {(productModel !== undefined)?<ProductView productModel={productModel}/>:<h3>Không tìm thấy sản phẩm</h3>}
+                </SectionBody>
+            </Section>
+            <Section>
+                <SectionBody>
+                    <FormReview/>
                 </SectionBody>
             </Section>
             <Section>
@@ -27,22 +80,18 @@ const Product = props => {
                 </SectionTitle>
                 <SectionBody>
                     <Grid
-                        col={4}
+                        col={8}
                         mdCol={2}
                         smCol={1}
                         gap={20}
                     >
                         {
-                            relatedProducts.map((item, index) => (
+                            (mostPopularProducts)? mostPopularProducts.map((item, index)=>(
                                 <ProductCard
+                                    product={item}
                                     key={index}
-                                    img01={item.image01}
-                                    img02={item.image02}
-                                    name={item.title}
-                                    price={Number(item.price)}
-                                    slug={item.slug}
-                                />   
-                            ))
+                                />
+                            )):null
                         }
                     </Grid>
                 </SectionBody>

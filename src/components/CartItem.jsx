@@ -13,10 +13,10 @@ const CartItem = props => {
     const [item, setItem] = useState(props.item)
     const [quantity, setQuantity] = useState(props.item.quantity)
 
-    // useEffect(() => {
-    //     setItem(props.item)
-    //     setQuantity(props.item.quantity)
-    // }, [props.item])
+    useEffect(() => {
+        setItem(props.item)
+        setQuantity(props.item.quantity)
+    }, [props.item])
 
     const updateQuantity = (opt) => {
         if (opt === '+') {

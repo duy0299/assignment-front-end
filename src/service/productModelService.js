@@ -1,39 +1,54 @@
 import React from 'react'
 import axios from 'axios';
 
-import urlAPI from './urlAPI';
+import urlAPI, {sizePage} from './setingAPI';
+import isCurrentMonth from '../utils/isCurrentMonth';
 
 const productModelService = {
-    makeRequest : async () => {
-        axios.get("http://localhost:8080/models?page=0&size=3", {
+  
+    getAllByPage : async (page) => {
+        const response = await axios.get(urlAPI+"/models", {
             params: {
-            //   page: 10,
-            //   size: 1
+              page: page,
+              size: sizePage
             }
           })
-          .then(function (response) {
-            console.log(response);
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+          return response;
     },
-
-    TestAxios : async ()=>{
-        const data=await axios.get(urlAPI+'/models', {
-            params: {
-              id: 1
-            }
-          })
-          .then(function (response) {
-       
-            console.log(response);
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-        return data;
-      }
+    getNewProduct : async () => {
+      return await axios.get(urlAPI+"/models/new")
+    },
+    getMostPopularProduct : async () => {
+      return await axios.get(urlAPI+"/models/most-popular")
+    },
+    search : async (nameProduct, page) => {
+      const response = await axios.get(urlAPI+"/models/search", {
+          params: {
+          search: nameProduct,
+          page: page,
+          size: sizePage
+        }
+      })
+      return response;
+    },
+    getByPriceRange : async (priceFrom, priceTo, page) => {
+      const response = await axios.get(urlAPI+"/models/price-range", {
+          params: {
+          priceFrom: priceFrom,
+          priceTo: priceTo,
+          page: page,
+          size: sizePage
+        }
+      })
+      return response;
+    },
+    getById : async (id) => {
+      return await axios.get(urlAPI+"/model/"+id)
+    },
+    getByAllStatus : async () => {
+      const response = await axios.get(urlAPI+"/models/all-status")
+      return response;
+    },
     
 }
 

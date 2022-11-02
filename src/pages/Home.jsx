@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 
 import Helmet     from '../components/Helmet'
@@ -10,24 +10,167 @@ import Section, { SectionTitle, SectionBody } from '../components/Section'
 
 import heroSliderData from '../assets/fake-data/hero-slider'
 import policy from '../assets/fake-data/policy'
-import productData from '../assets/fake-data/products'
 
 import banner from '../assets/images/banner/banner3.jpg'
+import productModelService  from '../service/productModelService'
 
 const Home = () => {
+    const [newModel, setNewModel] = useState(null);
+    const [mostPopularProducts, setMostPopularProducts] = useState((null));
+    // const [loading, setLoading] = useState(false);
+    
 
-    console.log(heroSliderData);
+    const loadNewProduct = useCallback(
+        () => {
+            productModelService.getNewProduct()
+            .then(function (response) {
+                setNewModel(response.data.result)
+            })
+            .catch(function (error) {
+                console.log(error.message);
+                return null
+            });
+        },
+        []
+    )
+    const loadMostPopularProducts = useCallback(
+        () => {
+            productModelService.getMostPopularProduct()
+            .then(function (response) {
+                setMostPopularProducts(response.data.result)
+            })
+            .catch(function (error) {
+                console.log(error.message);
+                return null
+            });
+        },
+        []
+    )
+
+    // const loadlAllModelCompletet = useCallback(
+    //     () => {
+    //         let now = new Date();
+    //         let dataMostPopular = allModel;
+    //         // TÌM  new product on this month
+    //         let dataNewModel =  allModel.filter(e => {
+    //                         let result = isCurrentMonth(e.timeCreate, now.getMonth()+1, now.getFullYear())
+    //                         return result
+    //                     })
+    //         //max => min
+    //         dataMostPopular.sort(function(a, b){return b.listUserLike.length - a.listUserLike.length});
+    //         if(dataMostPopular.length>10){
+    //             dataMostPopular= dataMostPopular.slice(0, 9)
+    //         }
+
+    //         // Set data
+    //         setMostPopularProducts(dataMostPopular)
+    //         setNewModel(dataNewModel)
+    //     },
+    //     [allModel]
+    // )
+
+    
+    useEffect(() => {
+        loadMostPopularProducts();
+        loadNewProduct();
+    }, []);  
+ 
+    
+    
+
     return (
         <Helmet title='Trang chủ'>
             {/* hero slider */}
             <HeroSlider 
                 data={heroSliderData}
                 control={true}
-                auto={false}
-                timeOut={4000}
+                auto={true}
+                timeOut={3000}
                />
+            
+            {/* list Best selling section */}
+            {/* <Section>
+                <SectionTitle>
+                    Top sản phẩm bán chạy trong tuần
+                </SectionTitle>
+                <SectionBody>
+                    <Grid 
+                        col={5}
+                        mdCol={2}
+                        smCol={1}
+                        gap={20}
+                    >
+                        
+                        {
+                           (listNewModel)? listNewModel.map((item, index)=>(
+                                <ProductCard
+                                    product={item}
+                                    key={index}
+                                />
+                            )):null
+                        }
+                    </Grid>
+                </SectionBody>
+            </Section> */}
+
+            <Section>
+                <SectionTitle>
+                    Sản phẩm phổ biến
+                </SectionTitle>
+                <SectionBody>
+                <Grid 
+                    col={5}
+                    mdCol={2}
+                    smCol={1}
+                    gap={20}
+                >
+                    {
+                        (mostPopularProducts)? mostPopularProducts.map((item, index)=>(
+                            <ProductCard
+                                product={item}
+                                key={index}
+                            />
+                        )):null
+                    }
+                </Grid>
+                </SectionBody>
+            </Section>
+
+            {/* Banner */}
+            <Section>
+                <SectionBody>
+                    <Link to='/catalog'>
+                        <img src={banner} alt='banner'/>
+                    </Link>
+                </SectionBody>
+            </Section>
+
+            {/* new arrival */}
+            <Section>
+                <SectionTitle>
+                    Sản phẩm mới
+                </SectionTitle>
+                <SectionBody>
+                    <Grid 
+                        col={5}
+                        mdCol={2}
+                        smCol={1}
+                        gap={20}
+                    >
+                        {
+                           (newModel)? newModel.map((item, index)=>(
+                                <ProductCard
+                                    product={item}
+                                    key={index}
+                                />
+                            )):null
+                        }
+                    </Grid>
+                </SectionBody>
+            </Section>
+
                {/* list policy */}
-            <Section >
+               <Section >
                 <SectionBody>
                     <Grid 
                         col={4}
@@ -49,98 +192,6 @@ const Home = () => {
                 </SectionBody>
             </Section>
 
-            {/* list Best selling section */}
-            <Section>
-                <SectionTitle>
-                    Top sản phẩm bán chạy trong tuần
-                </SectionTitle>
-                <SectionBody>
-                    <Grid 
-                        col={5}
-                        mdCol={2}
-                        smCol={1}
-                        gap={20}
-                    >
-                        {
-                            productData.getProducts(5).map((item, index)=>(
-                                <ProductCard
-                                    key={index}
-                                    img01= {item.image01}
-                                    img02={item.image02}
-                                    name={item.title}
-                                    price={item.price}
-                                    slug={item.slug}
-                                />
-                            ))
-                        }
-                    </Grid>
-                </SectionBody>
-            </Section>
-
-            {/* new arrival */}
-            <Section>
-                <SectionTitle>
-                    Sản phẩm mới
-                </SectionTitle>
-                <SectionBody>
-                    <Grid 
-                        col={5}
-                        mdCol={2}
-                        smCol={1}
-                        gap={20}
-                    >
-                        {
-                            productData.getProducts(10).map((item, index)=>(
-                                <ProductCard
-                                    key={index}
-                                    img01= {item.image01}
-                                    img02={item.image02}
-                                    name={item.title}
-                                    price={item.price}
-                                    slug={item.slug}
-                                />
-                            ))
-                        }
-                    </Grid>
-                </SectionBody>
-            </Section>
-
-            {/* Banner */}
-            <Section>
-                <SectionBody>
-                    <Link to='/catalog'>
-                        <img src={banner} alt='banner'/>
-                    </Link>
-                </SectionBody>
-            </Section>
-
-            {/*  */}
-            <Section>
-                <SectionTitle>
-                    Sản phẩm phổ biến
-                </SectionTitle>
-                <SectionBody>
-                <Grid 
-                    col={5}
-                    mdCol={2}
-                    smCol={1}
-                    gap={20}
-                >
-                    {
-                        productData.getProducts(15).map((item, index)=>(
-                            <ProductCard
-                                key={index}
-                                img01= {item.image01}
-                                img02={item.image02}
-                                name={item.title}
-                                price={item.price}
-                                slug={item.slug}
-                            />
-                        ))
-                    }
-                </Grid>
-                </SectionBody>
-            </Section>
         </Helmet>
     )
 }

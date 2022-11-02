@@ -1,0 +1,130 @@
+.form-review {
+    // display: block;
+    &__title{
+        background-color: rgb(233, 235, 235);
+        border: 1px solid #e5e5e5;
+        width: 100%;
+        margin-bottom: 3rem;
+        height: 4rem;
+
+        ul {
+            margin-block-start: 1em;
+            margin-block-end: 1em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            padding-inline-start: 40px;
+            li{
+                float: left;
+                font-size: 20px;
+                padding-left: 4rem;
+                display: inline-block;
+            }
+        }
+            
+    }
+
+    &__display{
+        margin-top: 2rem;
+        border: 1px solid #e5e5e5;
+        padding: 30px;
+        display: block;
+        
+        h2{
+            padding: 5px 0;
+        }
+
+        &__review{
+            border: 1px solid #e5e5e5;
+            margin-bottom: 35px;
+            
+
+            &__table{
+                width: 100%;
+
+                &__title{
+                    background-color:rgb(233, 235, 235);
+                    border: 1px solid #e5e5e5;
+                    height: 2.5rem;
+                    
+
+                    &__date{
+                        float: right;
+                        padding: 15px;
+                        font-size: 17px;
+                    }
+
+                    &__name{
+                        padding: 15px;
+                        font-size: 17px;
+                    }
+                }
+
+
+                &__content{
+                    
+                    p{
+                        padding: 15px;
+                        font-size: 15px;
+                    }
+
+
+                    &__rating{
+                        padding: 15px;
+                    }
+                }
+            }
+
+            
+        }
+
+        &__form{
+            padding: 10px 15px 15px ;
+
+            &__message{
+                margin-bottom: 15px;
+                label{
+                    font-size: 19px;
+                }
+                textarea{
+                    margin: 15px 0;
+                    width: 100%;
+                    overflow: auto;
+                    padding: 5px;
+                    resize: vertical;
+                    font-size: 15px;
+                }
+                p{
+                    color: rgb(253, 21, 21);
+                    font-size: 15px;
+                }
+            }
+
+            &__rating{
+                font-size: 18px;
+
+                &__start{
+                    position: absolute;
+                    top: 4px;
+
+                    label{
+                        font-size: 25px;
+
+                    }
+                }
+                 
+                Button{
+                    float: right;
+                    padding: 7px 20px;
+                    font-size: 17px;
+                    top: -20px;
+                }
+            }
+        }
+    }
+
+    
+}
+
+.__not-active-review{
+    display: block;
+}
