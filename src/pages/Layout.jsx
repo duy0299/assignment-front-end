@@ -1,29 +1,25 @@
 import React from 'react'
 
-import { BrowserRouter, Route } from 'react-router-dom'
+import { BrowserRouter, Route, useNavigate } from 'react-router-dom'
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
 
-import Routes from '../routes/Routes'
+import PageRouter from '../routes/PageRouter'
 
-const Layout = () => {
+const Layout = (props) => {
+    
     return (
-        <BrowserRouter>
-            <Route render={props => (
-                <div>
-                    <Header {...props}/>
-                    <div className="container">
-                        <div className="main">
-                            {/* tùy trang do route quyết định*/}
-                            <Routes/>
-                        </div>
-                    </div>
-                    <Footer/>                    
+        <div>
+            <Header/>
+            <div className="container">
+                <div className="main">
+                    {props.children}
                 </div>
-            )}/>
-        </BrowserRouter>
+            </div>
+            <Footer/>                    
+        </div>
     )
 }
 

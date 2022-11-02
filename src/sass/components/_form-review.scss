@@ -80,6 +80,20 @@
         &__form{
             padding: 10px 15px 15px ;
 
+            .label-start{
+                font-size: 19px;
+            }
+            &__start{
+                padding: 10px 0 20px;
+                position: absolute;
+                top: 6px;
+
+                label{
+                    font-size: 25px;
+
+                }
+            }
+
             &__message{
                 margin-bottom: 15px;
                 label{
@@ -102,16 +116,6 @@
             &__rating{
                 font-size: 18px;
 
-                &__start{
-                    position: absolute;
-                    top: 4px;
-
-                    label{
-                        font-size: 25px;
-
-                    }
-                }
-                 
                 Button{
                     float: right;
                     padding: 7px 20px;

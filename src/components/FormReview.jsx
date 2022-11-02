@@ -45,6 +45,16 @@ const FormReview = (props) => {
             </div>
             <h2>Write a review</h2>
             <form className="form-review__display__form">
+                <div>
+                    <label className='label-start'>Đánh giá của bạn: </label>
+                    <Rating className='form-review__display__form__start'
+                        name="simple-controlled"
+                        value={value}
+                        onChange={(event, newValue) => {
+                        setValue(newValue);
+                        }}
+                    />
+                </div>
                 <div className="form-review__display__form__message">
                     <div className="col-sm-12 p-0">
                         <label className="control-label">Hãy ghi lại những trải nghiệm chủa bạn</label><br/>
@@ -53,16 +63,6 @@ const FormReview = (props) => {
                     </div>
                 </div>
                 <div className="form-review__display__form__rating">
-                    <div>
-                        <label>Đánh giá của bạn: </label>
-                        <Rating className='form-review__display__form__rating__start'
-                            name="simple-controlled"
-                            value={value}
-                            onChange={(event, newValue) => {
-                            setValue(newValue);
-                            }}
-                        />
-                    </div>
                     <Button size="sm" >
                         Gửi
                     </Button>

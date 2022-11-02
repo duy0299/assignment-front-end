@@ -10,6 +10,7 @@ import ProductView from '../components/ProductView'
 import productModelService  from '../service/productModelService'
 import isCurrentMonth from '../utils/isCurrentMonth'
 import FormReview from '../components/FormReview'
+import { useParams } from 'react-router-dom'
 
 
 
@@ -17,10 +18,11 @@ const Product = props => {
     const [productModel, setProductModel] = useState(undefined);
     const [mostPopularProducts, setMostPopularProducts] = useState(null);
     const [loading, setLoading] = useState(false);
-   
+    const params = useParams();
     const loadProductModel = useCallback(
         () => {
-            productModelService.getById(props.match.params.id)
+            
+            productModelService.getById(params.id)
             .then(function (response) {
                 console.log(response.data.result);
                 setProductModel(response.data.result)
@@ -30,7 +32,7 @@ const Product = props => {
                 return null
             });
         },
-        [props.match.params.id]
+        [params.id]
     )
     const loadMostPopularProducts = useCallback(
         () => {

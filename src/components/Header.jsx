@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useResolvedPath } from 'react-router-dom'
 
 import logo from '../assets/images/Logo-2.png'
 
@@ -22,7 +22,7 @@ const mainNav = [
     }
 ]
 
-const Header = () => {
+const Header = (props) => {
 // useLocation() để lấy path name phía sau host
     const {pathname} = useLocation();
     console.log(pathname);
@@ -43,7 +43,7 @@ const Header = () => {
             }
         })
         return () => {
-            window.removeEventListener("scroll")
+            window.removeEventListener('scroll')
         };
     }, []);
     
