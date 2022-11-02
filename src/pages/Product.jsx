@@ -24,7 +24,6 @@ const Product = props => {
             
             productModelService.getById(params.id)
             .then(function (response) {
-                console.log(response.data.result);
                 setProductModel(response.data.result)
             })
             .catch(function (error) {

@@ -1,26 +1,27 @@
-import React from 'react'
 import axios from 'axios';
 
 import urlAPI, {sizePage} from './setingAPI';
-import isCurrentMonth from '../utils/isCurrentMonth';
 
 const productModelService = {
   
     getAllByPage : async (page) => {
-        const response = await axios.get(urlAPI+"/models", {
-            params: {
-              page: page,
-              size: sizePage
-            }
-          })
-          return response;
+      const response = await axios.get(urlAPI+"/models", {
+          params: {
+            page: page,
+            size: sizePage
+          }
+        })
+      return response;
     },
+
     getNewProduct : async () => {
       return await axios.get(urlAPI+"/models/new")
     },
+
     getMostPopularProduct : async () => {
       return await axios.get(urlAPI+"/models/most-popular")
     },
+
     search : async (nameProduct, page) => {
       const response = await axios.get(urlAPI+"/models/search", {
           params: {
@@ -31,6 +32,7 @@ const productModelService = {
       })
       return response;
     },
+
     getByPriceRange : async (priceFrom, priceTo, page) => {
       const response = await axios.get(urlAPI+"/models/price-range", {
           params: {
@@ -42,9 +44,11 @@ const productModelService = {
       })
       return response;
     },
+
     getById : async (id) => {
       return await axios.get(urlAPI+"/model/"+id)
     },
+
     getByAllStatus : async () => {
       const response = await axios.get(urlAPI+"/models/all-status")
       return response;

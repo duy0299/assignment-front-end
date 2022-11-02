@@ -47,27 +47,6 @@ const Home = () => {
         []
     )
 
-    // const loadlAllModelCompletet = useCallback(
-    //     () => {
-    //         let now = new Date();
-    //         let dataMostPopular = allModel;
-    //         // TÌM  new product on this month
-    //         let dataNewModel =  allModel.filter(e => {
-    //                         let result = isCurrentMonth(e.timeCreate, now.getMonth()+1, now.getFullYear())
-    //                         return result
-    //                     })
-    //         //max => min
-    //         dataMostPopular.sort(function(a, b){return b.listUserLike.length - a.listUserLike.length});
-    //         if(dataMostPopular.length>10){
-    //             dataMostPopular= dataMostPopular.slice(0, 9)
-    //         }
-
-    //         // Set data
-    //         setMostPopularProducts(dataMostPopular)
-    //         setNewModel(dataNewModel)
-    //     },
-    //     [allModel]
-    // )
 
     
     useEffect(() => {
