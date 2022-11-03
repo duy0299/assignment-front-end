@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
+import swal from 'sweetalert'
 import Rating from '@mui/material/Rating';
 import { Link } from 'react-router-dom'
 
@@ -6,13 +7,15 @@ import Button from './Button'
 
 import numberWithCommas from '../utils/numberWithCommas'
 import formatVND from '../utils/formatVND'
+import wishlistService from "../service/wishlistService";
 
 import cookies from '../utils/cookies';
+import { useEffect } from 'react';
 const user = (cookies.getUser()!==null)?cookies.getUser():"";
-
 
 const ProductCard = props => {
     // console.log(props.product);
+    const wishlistRef = useRef(null); 
     const id        = props.product.id       
     const img01     = props.product.listImages[0]
     const img02     = props.product.listImages[1]
@@ -20,14 +23,58 @@ const ProductCard = props => {
     const priceTo   = props.product.priceTo  
     const priceFrom = props.product.priceFrom
     const priceRoot = props.product.priceRoot
-    let wishlist  = false;
+    const [idWishlist, setIdWishlist] = useState(undefined);
     const email = user.name
-    for (const item of props.product.listUserLike ) {
-        if (item === email) {
-            wishlist = true;
+
+    useEffect(()=>{
+        for (const item of props.product.listWishlist ) {
+            if (item.email === email) {
+                setIdWishlist(item.id)
+            }
         }
-    }
+    },[])
     
+    const addWishlist = useCallback((e)=>{
+        wishlistService.insert(id)
+                .then(function (response) {
+                    console.log(response.data);
+                    swal (
+                            {
+                            title: "Thành  công",
+                            icon: "success"
+                        }
+                    )
+                })
+                .catch(function (error) {
+                    if(error.response.data.message == null){
+                        swal("Lỗi", error.response.data.result, "error");
+                    }else{
+                        swal("Lỗi", error.response.data.message, "error");
+                    }
+                    
+                    console.log(error);
+                })
+    })
+    const removeWishlist = useCallback((e)=>{
+        wishlistService.delete(idWishlist)
+                .then(function (response) {
+                    console.log(response.data);
+                    swal (
+                            {
+                            title: "Thành  công",
+                            icon: "success"
+                        }
+                    )
+                })
+                .catch(function (error) {
+                    if(error.response.data.message == null){
+                        swal("Lỗi", error.response.data.result, "error");
+                    }else{
+                        swal("Lỗi", error.response.data.message, "error");
+                    }
+                    console.log(error);
+                })
+    })
     
     let ComponentPrice = (props) =>{
         if(props.priceFrom ===  props.priceTo){
@@ -54,7 +101,7 @@ const ProductCard = props => {
     
 
     return (
-        <div className="product-card">
+        <div className="product-card" ref={wishlistRef}>
             <Link to={`/product/${id}`}>
                 <div className="product-card__image">
                     <img src={img01} alt="avatar" />
@@ -78,7 +125,7 @@ const ProductCard = props => {
                     />
                     <span className="product-card__price__old">
                         <Link>
-                            {(wishlist)?<i className='bx bxs-heart'></i>:<i className='bx bx-heart'></i>}
+                            {(idWishlist)?<i className='bx bxs-heart' onClick={removeWishlist}></i>:<i className='bx bx-heart' onClick={addWishlist}></i>}
                         </Link>
                     </span>
                 </div>
@@ -98,6 +145,7 @@ const ProductCard = props => {
         </div>
     )
 }
+
 
 // ProductCard.propTypes = {
 //     product:         PropTypes.object.isRequired,

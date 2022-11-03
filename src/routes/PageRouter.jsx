@@ -9,11 +9,13 @@ import Product  from '../pages/Product'
 import Layout from '../pages/Layout'
 import Login from '../pages/Login'
 import Register from '../pages/Register'
+import Wishlist from '../pages/Wishlist'
 
 const HomePage = <Layout><Home/></Layout>;
 const ProductPage = <Layout><Product/></Layout>;
 const RegisterPage = <Layout><Register/></Layout>;
 const CatalogPage = <Layout><Catalog/></Layout>;
+const WishlistPage = <Layout><Wishlist/></Layout>;
 
 const PageRouter = () => {
     
@@ -26,6 +28,7 @@ const PageRouter = () => {
                 <Route path='/login' exact element={<Login/>}/>
                 <Route path='/product/:id' element={ProductPage}/>
                 <Route path='/register' element={RegisterPage}/>
+                <Route path='/wishlist' element={WishlistPage}/>
                 <Route path='/catalog/:page' element={CatalogPage}/>
                 {/* <Route path='/cart' component={Cart}/> */}
             </Routes>

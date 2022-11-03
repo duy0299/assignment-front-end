@@ -42,9 +42,9 @@ const Catalog = () => {
                     setTotalPage(response.data.totalPage)
                     setArrTotalPage((e)=>{
                         e = new Array();
+                        console.log(response.data);
                         for (let i = 1; i < response.data.totalPage+1; i++) {
                             e.push(i)
-                            
                         }
                         return e;
                     })

@@ -1,11 +1,9 @@
-import axios from 'axios';
-
-import urlAPI from './setingAPI';
+import service from './setingAPI';
 
 const authService = {
   
     login : async (email, password) => {
-        const response = await axios.post(urlAPI+"/login", {
+        const response = await service.post("/login", {
           email: email,
           password: password
         })
@@ -13,7 +11,7 @@ const authService = {
     },
     
     register : async (firstName, lastName, phoneNumber, gender, email, password, passwordConfirmation) => {
-      return await axios.post(urlAPI+"/register", {
+      return await service.post("/register", {
         firstName : firstName,
         lastName : lastName,
         phoneNumber : phoneNumber,

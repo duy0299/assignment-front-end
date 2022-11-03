@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import swal from 'sweetalert'
 import PropTypes from 'prop-types'
 
 import Button from './Button'
-
 
 import numberWithCommas from '../utils/numberWithCommas'
 import formatVND from '../utils/formatVND'
 import cookies from '../utils/cookies';
 import { Link } from 'react-router-dom'
+import wishlistService from '../service/wishlistService'
+
+
 const user = (cookies.getUser()!==null)?cookies.getUser():"";
 
 
 const ProductView = props => {
     let productModel = props.productModel
-    let priceSave = 0;
+    
     const [previewImg, setPreviewImg] = useState(productModel.listImages[0])
     const [descriptionExpand, setDescriptionExpand] = useState(false)
     const [product, setProduct] = useState(undefined)
@@ -21,11 +24,52 @@ const ProductView = props => {
     
     let wishlist  = false;
     const email = user.name
-    for (const item of productModel.listUserLike) {
-        if (item === email) {
+    for (const item of productModel.listWishlist) {
+        if (item.email === email) {
             wishlist = true;
         }
     }
+    const addWishlist = useCallback((e)=>{
+        wishlistService.insert(productModel.id)
+                .then(function (response) {
+                    console.log(response.data);
+                    swal (
+                            {
+                            title: "Thành  công",
+                            icon: "success"
+                        }
+                    )
+                })
+                .catch(function (error) {
+                    if(error.response.data.message == null){
+                        swal("Lỗi", error.response.data.result, "error");
+                    }else{
+                        swal("Lỗi", error.response.data.message, "error");
+                    }
+                    
+                    console.log(error);
+                })
+    })
+    const removeWishlist = useCallback((e)=>{
+        wishlistService.delete(productModel.id)
+                .then(function (response) {
+                    console.log(response.data);
+                    swal (
+                            {
+                            title: "Thành  công",
+                            icon: "success"
+                        }
+                    )
+                })
+                .catch(function (error) {
+                    if(error.response.data.message == null){
+                        swal("Lỗi", error.response.data.result, "error");
+                    }else{
+                        swal("Lỗi", error.response.data.message, "error");
+                    }
+                    console.log(error);
+                })
+    })
 
     const updateQuantity = (type) => {
         if (type === 'plus') {
@@ -34,17 +78,7 @@ const ProductView = props => {
             setQuantity(quantity - 1 < 1 ? 1 : quantity - 1)
         }
     }
-
-    useEffect(() => {
-        setPreviewImg(productModel.listImages[0])
-        setQuantity(1)
-        setProduct(undefined)
-    }, [productModel])
-
-    useEffect(() => {
-       
-    })
-
+    
     const check = () => {
         if (product === undefined) {
             alert('Vui lòng chọn kích cỡ!')
@@ -80,57 +114,20 @@ const ProductView = props => {
             props.history.push('/cart')
         }
     }
-    let ComponentPrice = (props) =>{
-        if(props.currentPrice === undefined){
-            if(props.priceFrom ===  props.priceTo){
-                return (
-                    <div className="product-card__price __price-view">
-                        {formatVND(numberWithCommas(props.priceRoot))}
-                    </div>
-                )
-            }else{
-                return (
-                    <div className="product-card__price __price-view">
-                        <span>
-                            {formatVND(numberWithCommas(props.priceFrom))}
-                        </span>
-                        <span> - </span>
-                        <span className="product-card__price __price-view">
-                            {formatVND(numberWithCommas(props.priceTo))}
-                        </span>
-                    </div>
-                )
-            }
-        }else{
-            if(props.currentPrice === props.priceRoot){
-                return (
-                    <div className="product-card__price __price-view">
-                        {formatVND(numberWithCommas(props.priceRoot))}
-                    </div>
-                )
-                
-            }else{
-                return (
-                    <div>
-                        <div className="product-card__price __price-view">
-                            <span>
-                                {formatVND(numberWithCommas(props.currentPrice))}
-                            </span>
-                            <span className="product-card__price__old ">
-                                <del>{numberWithCommas(props.priceRoot)}</del>
-                            </span>
-                        </div>
-                        <div className="product-card__price__save">
-                            <span>
-                                Tiết kiệm: {formatVND(numberWithCommas(props.priceRoot - props.currentPrice))}
-                            </span>
-                        </div>
-                    </div>
-                )
-            }
-        }
-        
-    }
+
+    // useEffect
+    useEffect(() => {
+        setPreviewImg(productModel.listImages[0])
+        setQuantity(1)
+        setProduct(undefined)
+    }, [productModel])
+
+    useEffect(() => {
+       
+    })
+
+
+ 
 
 
     return (
@@ -167,17 +164,17 @@ const ProductView = props => {
                 <div className="product__info__item" key="r1">
                     <span className="product__info__item__price">
                         {(product!== undefined) ? 
-                        <ComponentPrice priceRoot={productModel.priceRoot} 
-                            priceFrom={productModel.priceFrom} 
-                            priceTo={productModel.priceTo}
-                            currentPrice={product.currentPrice}
-                        />
-                        : 
-                        <ComponentPrice priceRoot={productModel.priceRoot} 
-                                        priceFrom={productModel.priceFrom} 
-                                        priceTo={productModel.priceTo}
-                                        currentPrice={undefined}
-                                        />}
+                            <ComponentPrice priceRoot={productModel.priceRoot} 
+                                priceFrom={productModel.priceFrom} 
+                                priceTo={productModel.priceTo}
+                                currentPrice={product.currentPrice}
+                            />
+                            : 
+                            <ComponentPrice priceRoot={productModel.priceRoot} 
+                                            priceFrom={productModel.priceFrom} 
+                                            priceTo={productModel.priceTo}
+                                            currentPrice={undefined}
+                                            />}
                         
                     </span>
                 </div>
@@ -188,7 +185,13 @@ const ProductView = props => {
                     <div className="product__info__item__list">
                         {
                             productModel.listProduct.map((item, index) => (
-                                <div key={index} className={`product__info__item__list__item ${(((product!==undefined)?product.size.id:null) === item.size.id) ? 'active' : ''}`} onClick={() => setProduct(item)}>
+                                <div key={index} 
+                                    className={`product__info__item__list__item 
+                                    ${(((product!==undefined)?product.size.id:null) === item.size.id) ? 'active' : ''}`} 
+                                    onClick={() => {
+                                    setProduct(item)
+                                    setPreviewImg(item.avatar)    
+                                } }>
                                     <span className="product__info__item__list__item__size">
                                         {item.size.name}
                                     </span>
@@ -245,3 +248,55 @@ ProductView.propTypes = {
 }
 
 export default ProductView
+   // component
+   let ComponentPrice = (props) =>{
+    if(props.currentPrice === undefined){
+        if(props.priceFrom ===  props.priceTo){
+            return (
+                <div className="product-card__price __price-view">
+                    {formatVND(numberWithCommas(props.priceRoot))}
+                </div>
+            )
+        }else{
+            return (
+                <div className="product-card__price __price-view">
+                    <span>
+                        {formatVND(numberWithCommas(props.priceFrom))}
+                    </span>
+                    <span> - </span>
+                    <span className="product-card__price __price-view">
+                        {formatVND(numberWithCommas(props.priceTo))}
+                    </span>
+                </div>
+            )
+        }
+    }else{
+        if(props.currentPrice === props.priceRoot){
+            return (
+                <div className="product-card__price __price-view">
+                    {formatVND(numberWithCommas(props.priceRoot))}
+                </div>
+            )
+            
+        }else{
+            return (
+                <div>
+                    <div className="product-card__price __price-view">
+                        <span>
+                            {formatVND(numberWithCommas(props.currentPrice))}
+                        </span>
+                        <span className="product-card__price__old ">
+                            <del>{numberWithCommas(props.priceRoot)}</del>
+                        </span>
+                    </div>
+                    <div className="product-card__price__save">
+                        <span>
+                            Tiết kiệm: {formatVND(numberWithCommas(props.priceRoot - props.currentPrice))}
+                        </span>
+                    </div>
+                </div>
+            )
+        }
+    }
+    
+}

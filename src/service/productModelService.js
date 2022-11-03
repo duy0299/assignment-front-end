@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-import urlAPI, {sizePage} from './setingAPI';
+import service, {sizePage} from './setingAPI';
 
 const productModelService = {
   
     getAllByPage : async (page) => {
-      const response = await axios.get(urlAPI+"/models", {
+      const response = await service.get("/models", {
           params: {
             page: page,
             size: sizePage
@@ -15,15 +15,15 @@ const productModelService = {
     },
 
     getNewProduct : async () => {
-      return await axios.get(urlAPI+"/models/new")
+      return await service.get("/models/new")
     },
 
     getMostPopularProduct : async () => {
-      return await axios.get(urlAPI+"/models/most-popular")
+      return await service.get("/models/most-popular")
     },
 
     search : async (nameProduct, page) => {
-      const response = await axios.get(urlAPI+"/models/search", {
+      const response = await service.get("/models/search", {
           params: {
           search: nameProduct,
           page: page,
@@ -34,7 +34,7 @@ const productModelService = {
     },
 
     getByPriceRange : async (priceFrom, priceTo, page) => {
-      const response = await axios.get(urlAPI+"/models/price-range", {
+      const response = await service.get("/models/price-range", {
           params: {
           priceFrom: priceFrom,
           priceTo: priceTo,
@@ -46,11 +46,11 @@ const productModelService = {
     },
 
     getById : async (id) => {
-      return await axios.get(urlAPI+"/model/"+id)
+      return await service.get("/model/"+id)
     },
 
     getByAllStatus : async () => {
-      const response = await axios.get(urlAPI+"/models/all-status")
+      const response = await service.get("/models/all-status")
       return response;
     },
     

@@ -13,7 +13,7 @@ const mainNav = [
     },
     {
         display: "Sản phẩm",
-        path: "/catalog"
+        path: "/catalog/1"
     },
     {
         display: "Liên hệ",
