@@ -1,4 +1,5 @@
 import React  from "react";
+import swal from 'sweetalert'
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -45,10 +46,20 @@ const Form = props => {
             .then(function (response) {
                 console.log(response.data.result);
                 cookies.setUser(response.data.result);
-                navigate("/home")
+                // swal("Thành công", "success");
+                swal ( {
+                        title: "Thành  công",
+                        icon: "success",
+                        button: "Về trang chủ"
+                      }  )
+                  . then ( ( value ) =>  { 
+                    navigate("/home")
+                  } ) ;
+
+                
             })
             .catch(function (error) {
-                alert(error.response.data.message);
+              swal("Lỗi", "Email hoặc mật khẩu không đúng", "error");
                 console.log(error);
             })
         

@@ -13,6 +13,7 @@ import Register from '../pages/Register'
 const HomePage = <Layout><Home/></Layout>;
 const ProductPage = <Layout><Product/></Layout>;
 const RegisterPage = <Layout><Register/></Layout>;
+const CatalogPage = <Layout><Catalog/></Layout>;
 
 const PageRouter = () => {
     
@@ -25,7 +26,7 @@ const PageRouter = () => {
                 <Route path='/login' exact element={<Login/>}/>
                 <Route path='/product/:id' element={ProductPage}/>
                 <Route path='/register' element={RegisterPage}/>
-                {/* <Route path='/catalog' component={Catalog}/> */}
+                <Route path='/catalog/:page' element={CatalogPage}/>
                 {/* <Route path='/cart' component={Cart}/> */}
             </Routes>
         </BrowserRouter>

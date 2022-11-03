@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import urlAPI, {sizePage} from './setingAPI';
+import urlAPI from './setingAPI';
 
 const authService = {
   

@@ -1,0 +1,65 @@
+._pageCounter{
+    @include flex(center, center);
+    margin: 25px 0;
+    Link{
+        width: 50px;
+    }
+    
+    &__active-page{
+        background-color: rgb(255, 214, 101);
+        margin: 0 10px;
+        display: block;
+        width: 36px;
+        height: 36px;
+        border: 3px solid rgb(255, 214, 101);
+        border-radius: 50%;
+
+        p{
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            padding: 0.1rem;
+        }
+    }
+
+    &__next,  &__pre{
+        margin: 0 15px;
+        display: block;
+        width: 36px;
+        height: 36px;
+        border: 3px solid black;
+        border-radius: 50%;
+        i{
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            padding: 0.1rem;
+        }
+    }
+
+    
+
+
+    &__page{
+        margin: 0 10px;
+        display: block;
+        width: 36px;
+        height: 36px;
+        border: 3px solid black;
+        border-radius: 50%;
+
+        p{
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            padding: 0.1rem;
+        }
+
+        
+    }
+
+    :hover{
+        border-color: rgb(43, 43, 243);
+    }
+    
+}

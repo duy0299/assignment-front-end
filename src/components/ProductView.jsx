@@ -6,6 +6,11 @@ import Button from './Button'
 
 import numberWithCommas from '../utils/numberWithCommas'
 import formatVND from '../utils/formatVND'
+import cookies from '../utils/cookies';
+import { Link } from 'react-router-dom'
+const user = (cookies.getUser()!==null)?cookies.getUser():"";
+
+
 const ProductView = props => {
     let productModel = props.productModel
     let priceSave = 0;
@@ -13,9 +18,10 @@ const ProductView = props => {
     const [descriptionExpand, setDescriptionExpand] = useState(false)
     const [product, setProduct] = useState(undefined)
     const [quantity, setQuantity] = useState(1)
-    let wishlist  = true;
-    const email = "b@gmail.com"
-    for (const item of productModel.listUserLike ) {
+    
+    let wishlist  = false;
+    const email = user.name
+    for (const item of productModel.listUserLike) {
         if (item === email) {
             wishlist = true;
         }
@@ -78,7 +84,7 @@ const ProductView = props => {
         if(props.currentPrice === undefined){
             if(props.priceFrom ===  props.priceTo){
                 return (
-                    <div className="product-card__price">
+                    <div className="product-card__price __price-view">
                         {formatVND(numberWithCommas(props.priceRoot))}
                     </div>
                 )
@@ -96,8 +102,7 @@ const ProductView = props => {
                 )
             }
         }else{
-            console.log(props.currentPrice, props.priceRoot, props.priceTo);
-            if(props.currentPrice > props.priceRoot){
+            if(props.currentPrice === props.priceRoot){
                 return (
                     <div className="product-card__price __price-view">
                         {formatVND(numberWithCommas(props.priceRoot))}
@@ -159,7 +164,7 @@ const ProductView = props => {
             </div>
             <div className="product__info">
                 <h1 className="product__info__title">{productModel.name}</h1>
-                <div className="product__info__item">
+                <div className="product__info__item" key="r1">
                     <span className="product__info__item__price">
                         {(product!== undefined) ? 
                         <ComponentPrice priceRoot={productModel.priceRoot} 
@@ -171,12 +176,12 @@ const ProductView = props => {
                         <ComponentPrice priceRoot={productModel.priceRoot} 
                                         priceFrom={productModel.priceFrom} 
                                         priceTo={productModel.priceTo}
-                                        // currentPrice={productModel.currentPrice}
+                                        currentPrice={undefined}
                                         />}
                         
                     </span>
                 </div>
-                <div className="product__info__item">
+                <div className="product__info__item"  key="r2">
                     <div className="product__info__item__title">
                         Kích cỡ
                     </div>
@@ -192,7 +197,7 @@ const ProductView = props => {
                         }
                     </div>
                 </div>
-                <div className="product__info__item">
+                <div className="product__info__item"  key="r3">
                     <div className="product__info__item__title">
                         Số lượng
                     </div>
@@ -207,11 +212,13 @@ const ProductView = props => {
                             <i className="bx bx-plus" onClick={()=>updateQuantity('plus')}></i>
                         </div>
                         <span className= "product__info__item__quantity__favourite">
-                            {(wishlist)?<i class='bx bxs-heart'></i>:<i class='bx bx-heart'></i>}
+                            <Link>
+                                {(wishlist)?<i className='bx bxs-heart'></i>:<i className='bx bx-heart'></i>}
+                            </Link>
                         </span>
                     </div>
                 </div>
-                <div className="product__info__item">
+                <div className="product__info__item"  key="r4">
                     <Button onClick={() => addToCart()}>thêm vào giỏ</Button>
                     <Button onClick={() => goToCart()}>mua ngay</Button>
                 </div>

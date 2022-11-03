@@ -1,15 +1,19 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
+import swal from 'sweetalert'
 
 import Helmet from '../components/Helmet'
 import CheckBox from '../components/CheckBox'
 
-import productData from '../assets/fake-data/products'
 import category from '../assets/fake-data/category'
 import size from '../assets/fake-data/product-size'
 import Button from '../components/Button'
 import InfinityList from '../components/InfinityList'
 
 import productModelService  from '../service/productModelService'
+import Grid from '../components/Grid'
+import ProductCard from '../components/ProductCard'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import PageCounter from '../components/PageCounter'
 
 
 const Catalog = () => {
@@ -17,12 +21,43 @@ const Catalog = () => {
         category: [],
         size: []
     }
-
-    const [products, setProducts] = useState(()=>{
-        return productModelService.getAll(1);
-    })
-
+    const counterPageRef = useRef(null)
+    const params = useParams();
+    const [products, setProducts] = useState(undefined)
     const [filter, setFilter] = useState(initFilter)
+    const [currentPage, setCurrentPage] = useState(params.page)
+    const [totalPage, setTotalPage] = useState(1)
+    const [arrTotalPage, setArrTotalPage] = useState(new Array(1))
+
+    const  history = useLocation();
+    const navigate = useNavigate();
+
+    const loadListProduct = useCallback(
+        () => {
+            if(!Number.isNaN(params.page)){
+                productModelService.getAllByPage(params.page)
+                .then(function (response) {
+                    console.log(response.data);
+                    setProducts(response.data.result)
+                    setTotalPage(response.data.totalPage)
+                    setArrTotalPage((e)=>{
+                        e = new Array();
+                        for (let i = 1; i < response.data.totalPage+1; i++) {
+                            e.push(i)
+                            
+                        }
+                        return e;
+                    })
+                    
+                })
+                .catch(function (error) {
+                    console.log(error.message);
+                    return null
+                });
+            }
+        },
+        [params.page]
+    )
 
     const filterSelect = (type, checked, item) => {
         // if (checked) {
@@ -70,6 +105,60 @@ const Catalog = () => {
         },
         [filter, products],
     )
+    const changePageCounter = useCallback(
+        (e) => {
+           
+            let value =e.target.outerText
+            let url = history.pathname;
+            url = url.replace("/"+params.page, "/"+value)
+            history.pathname = url
+            console.log( history.pathname );
+            params.page = value;
+            navigate(url);
+        },
+        [],
+    )
+    const nextPageCounter = useCallback(
+        (e) => {
+            
+            let url = history.pathname;
+            let paramPage = Number.parseInt(params.page) +1
+            url = url.replace("/"+params.page, "/"+paramPage)
+            if(totalPage <= params.page){
+                swal("Chú ý", "bạn đang ở trang cuối", "warning");
+                return 0;
+            }
+            history.pathname = url
+            console.log( history.pathname );
+            params.page = paramPage;
+            navigate(url);
+        },
+        [],
+    )
+    const prePageCounter = useCallback(
+        (e) => {
+            let url = history.pathname;
+            let paramPage = Number.parseInt(params.page) -1
+            url = url.replace("/"+params.page, "/"+paramPage)
+            if(0 == params.page){
+                swal("Chú ý", "bạn đang ở trang đầu", "warning");
+                return 0;
+            }
+            history.pathname = url
+            console.log( history.pathname );
+            params.page = paramPage;
+            console.log();
+            navigate(url);
+        },
+        [],
+    )
+
+
+
+    
+    useEffect(() => {
+        loadListProduct()
+    }, [params]);
 
     useEffect(() => {
         updateProducts()
@@ -78,7 +167,11 @@ const Catalog = () => {
     const filterRef = useRef(null)
 
     const showHideFilter = () => filterRef.current.classList.toggle('active')
+    
 
+    if(Number.isNaN(params.page)){
+        return null;
+    }
     return (
         <Helmet title="Sản phẩm">
             <div className="catalog">
@@ -134,28 +227,49 @@ const Catalog = () => {
                     <Button size="sm" onClick={() => showHideFilter()}>bộ lọc</Button>
                 </div>
                 <div className="catalog__content">
-                    <InfinityList
+                    {/* <InfinityList
                         data={products}
-                    />
-                     {/* <Grid 
+                    /> */}
+                     <Grid 
                         col={4}
                         mdCol={2}
                         smCol={1}
                         gap={20}
                     >
+                        
                         {
-                            products.map((item, index)=>(
+                           (products)? products.map((item, index)=>(
                                 <ProductCard
+                                    product={item}
                                     key={index}
-                                    img01= {item.image01}
-                                    img02={item.image02}
-                                    name={item.title}
-                                    price={item.price}
-                                    slug={item.slug}
                                 />
-                            ))
+                            )):null
                         }
-                    </Grid> */}
+                    </Grid>
+                    
+                    <div className='_pageCounter' ref={counterPageRef}>
+                        <a href="javascript:void(0)">
+                            <div className='_pageCounter__pre' name="pre" onClick={prePageCounter} >
+                                
+                                <i className='bx bx-chevron-left' ></i>
+                            </div>
+                        </a>
+                        {
+                            (arrTotalPage !== null)?arrTotalPage.map((item, index)=>(
+                                <a href="javascript:void(0)">
+                                    <div className={`_pageCounter__${(item==params.page)?"active-page":"page"}`}  onClick={changePageCounter}>
+                                        <p>{item}</p>
+                                    </div>
+                                </a>
+                                
+                            )): null
+                        }
+                        <a href="javascript:void(0)">
+                            <div className='_pageCounter__next' name="next" onClick={nextPageCounter}>
+                                <i className='bx bx-chevron-right'></i>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </Helmet>

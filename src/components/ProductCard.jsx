@@ -2,20 +2,16 @@ import React, { useState } from 'react'
 import Rating from '@mui/material/Rating';
 import { Link } from 'react-router-dom'
 
-// import { useDispatch } from 'react-redux'
-
-// import { set } from '../redux/product-modal/productModalSlice'
-
 import Button from './Button'
 
 import numberWithCommas from '../utils/numberWithCommas'
 import formatVND from '../utils/formatVND'
 
+import cookies from '../utils/cookies';
+const user = (cookies.getUser()!==null)?cookies.getUser():"";
 
 
 const ProductCard = props => {
-    // console.log(props.product);
-    const [value, setValue] = useState( props.product.start );
     // console.log(props.product);
     const id        = props.product.id       
     const img01     = props.product.listImages[0]
@@ -24,16 +20,14 @@ const ProductCard = props => {
     const priceTo   = props.product.priceTo  
     const priceFrom = props.product.priceFrom
     const priceRoot = props.product.priceRoot
-    let wishlist  = true;
-    const email = "b@gmail.com"
+    let wishlist  = false;
+    const email = user.name
     for (const item of props.product.listUserLike ) {
         if (item === email) {
             wishlist = true;
         }
     }
     
-
-
     
     let ComponentPrice = (props) =>{
         if(props.priceFrom ===  props.priceTo){
@@ -66,7 +60,10 @@ const ProductCard = props => {
                     <img src={img01} alt="avatar" />
                     <img src={img02} alt="avatar" />
                 </div>
+            </Link>
+            <Link to={`/product/${id}`}>
                 <h3 className="product-card__name">{name}</h3>
+            </Link>
                 <div className="product-card__price">
                     <ComponentPrice 
                         priceRoot={priceRoot} 
@@ -76,14 +73,16 @@ const ProductCard = props => {
                 <div className="product-card__price">
                     <Rating
                         name="Read only"
-                        value={value}
+                        value={props.product.start}
                         readOnly
                     />
                     <span className="product-card__price__old">
-                        {(wishlist)?<i class='bx bxs-heart'></i>:<i class='bx bx-heart'></i>}
+                        <Link>
+                            {(wishlist)?<i className='bx bxs-heart'></i>:<i className='bx bx-heart'></i>}
+                        </Link>
                     </span>
                 </div>
-            </Link>
+            
             <div className="product-card__btn">
                 <Link to={`/cart`}>
                     <Button

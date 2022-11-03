@@ -1,36 +1,59 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+import swal from 'sweetalert'
 
 import Grid from '../components/Grid'
 
 import '../sass/components/_form-register.scss'
 
 import authService from "../service/authService";
-
+import validate from '../utils/validate';
 
 const Register = () => {
-    const [email,       setEmail] = useState(null);
-    const [phone,       setPhone] = useState(null);
-    const [firstName,   setFirstName] = useState(null);
-    const [lastName,    setLastName] = useState(null);
-    const [gender,      setGender] = useState(null);
-    const [password,    setpassword] = useState(null);
-    const [passwordConfirmation, setPasswordConfirmation] = useState(null);
+    const [email,       setEmail] = useState("");
+    const [phone,       setPhone] = useState("");
+    const [firstName,   setFirstName] = useState("");
+    const [lastName,    setLastName] = useState("");
+    const [gender,      setGender] = useState("");
+    const [password,    setpassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+    const navigate = useNavigate();
 
 
     const handleSubmit = (e) => {
-        e.preventDefault(firstName, lastName, phone, gender, email, password, passwordConfirmation);
-        authService.register()
-            .then(function (response) {
-                // console.log(response.data.result);
-                // cookies.setUser(response.data.result);
-                // navigate("/home")
-            })
-            .catch(function (error) {
-                alert(error.response.data.message);
+        e.preventDefault();
+        if (validate.register(firstName, lastName, phone, gender, email, password, passwordConfirmation)) {
+            try {
+                authService.register(firstName, lastName, phone, gender, email, password, passwordConfirmation)
+                .then(function (response) {
+                    console.log(response.data);
+                    swal (
+                            {
+                            title: "Thành  công",
+                            text: "chuyển về trang đăng nhập",
+                            icon: "success",
+                            button: "OK"
+                        }
+                    )
+                    .then ( ( value ) =>  { 
+                        navigate("/login")
+                    } ) ;
+                })
+                .catch(function (error) {
+                    if(error.response.data.message == null){
+                        swal("Lỗi", error.response.data.result, "error");
+                    }else{
+                        swal("Lỗi", error.response.data.message, "error");
+                    }
+                    
+                    console.log(error);
+                })
+            } catch (error) {
                 console.log(error);
-            })
+            }
+        };
+    }
         
-    };
 
     const handleFromChange = (e) => {
         for (const i of e.target.form) {

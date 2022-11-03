@@ -1,4 +1,4 @@
-import React,  { useCallback, useEffect, useState } from 'react'
+import React,  { useCallback, useEffect, useRef, useState } from 'react'
 
 import Grid from '../components/Grid'
 import Helmet from '../components/Helmet'
@@ -14,12 +14,12 @@ import { useParams } from 'react-router-dom'
 
 const Product = props => {
     const [productModel, setProductModel] = useState(undefined);
-    const [mostPopularProducts, setMostPopularProducts] = useState(null);
+    const [mostPopularProducts, setMostPopularProducts] = useState(undefined);
+   
     // const [loading, setLoading] = useState(false);
     const params = useParams();
     const loadProductModel = useCallback(
         () => {
-            
             productModelService.getById(params.id)
             .then(function (response) {
                 setProductModel(response.data.result)
@@ -42,8 +42,12 @@ const Product = props => {
                 return null
             });
         },
-        []
+        [productModel]
     )
+    const loadAfterRating = () => {
+            loadProductModel();
+            loadMostPopularProducts();
+        }
 
 
     useEffect(() => {
@@ -53,8 +57,9 @@ const Product = props => {
 
     useEffect(() => {
         window.scrollTo(0,0)
+        loadMostPopularProducts();
         loadProductModel()
-    }, [loadProductModel, mostPopularProducts])
+    }, [loadProductModel])
 
 
 
@@ -70,7 +75,7 @@ const Product = props => {
             </Section>
             <Section>
                 <SectionBody>
-                    <FormReview/>
+                    {(productModel)?<FormReview productModelId={productModel.id}  loadAfterRating={loadAfterRating} listRating={productModel.listRating} />:null}
                 </SectionBody>
             </Section>
             <Section>

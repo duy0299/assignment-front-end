@@ -5,7 +5,6 @@ const cookies = {
     },
 
     getUser(){
-        
         let strCookies = document.cookie;
         let listCookies = strCookies.split(";");
 
@@ -20,19 +19,8 @@ const cookies = {
         return null;
     },
     deleteUser(){
-        
-        let strCookies = document.cookie;
-        let listCookies = strCookies.split(";");
-
-        for(let i of listCookies) {
-            const lengthName = (userKey+"=").length
-            const key = i.slice(0, lengthName)
-            if (key === (userKey+"=")) {
-                const value = i.slice(lengthName, i.length)
-                return JSON.parse(value);
-            }
-        }
-        return null;
+        document.cookie = userKey+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+        return true;
     }
 
 }
