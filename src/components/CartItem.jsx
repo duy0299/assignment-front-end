@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 
 import numberWithCommas from '../utils/numberWithCommas'
 import { Link } from 'react-router-dom'
+import formatVND from '../utils/formatVND'
+import cartSession from '../utils/cartSession'
 
 const CartItem = props => {
 
@@ -20,35 +22,39 @@ const CartItem = props => {
 
     const updateQuantity = (opt) => {
         if (opt === '+') {
-            // call api update
+            cartSession.addToCart(item, 'up')
         }
         if (opt === '-') {
-            // call api update
+            cartSession.addToCart(item, 'down')
         }
+        props.callBack();
     }
 
     const updateCartItem = () => {
-        // dispatch(updateItem({...item, quantity: quantity}))
+        let newi = item;
+        newi.quantity= quantity;
+        cartSession.addToCart(newi, 'change');
+        props.callBack();
     }
 
     const removeCartItem = () => {
-        console.log('removeCartItem')
-       
+        cartSession.deleteCart(item.productId)
+        props.callBack();
     }
 
     return (
         <div className="cart__item" ref={itemRef}>
             <div className="cart__item__image">
-                <img src={item.product.image01} alt="" />
+                <img src={item.avatar} alt="" />
             </div>
             <div className="cart__item__info">
                 <div className="cart__item__info__name">
                     <Link to={`/catalog/${item.slug}`}>
-                        {`${item.product.title} - ${item.color} - ${item.size}`}
+                        {`${item.name} - size ${item.size}`}
                     </Link>
                 </div>
                 <div className="cart__item__info__price">
-                    {numberWithCommas(item.price)}
+                    {formatVND(numberWithCommas(item.price)) }
                 </div>
                 <div className="cart__item__info__quantity">
                     <div className="product__info__item__quantity">

@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useRef, useEffect, useCallback, useState } from 'react'
 import { Link, useLocation, useResolvedPath } from 'react-router-dom'
 import swal from 'sweetalert'
 
 import logo from '../assets/images/Logo-2.png'
+import cartSession from '../utils/cartSession'
 import cookies from '../utils/cookies'
 import Button from './Button'
 
@@ -25,9 +26,11 @@ const mainNav = [
     }
 ]
 
+
 const Header = (props) => {
 // useLocation() để lấy path name phía sau host
     const {pathname} = useLocation();
+    const [quantityInCart, setQuantityInCart] = useState((cartSession.getCart())?cartSession.getCart().length:0)
     const activeNav = mainNav.findIndex(e=> e.path === pathname)
     const headerRef = useRef(null)
     const menuLeft = useRef(null);
@@ -95,6 +98,7 @@ const Header = (props) => {
     useEffect(() => {
         window.addEventListener("scroll", scrollhandler)
         return () => {
+            setQuantityInCart((cartSession.getCart())?cartSession.getCart().length:0)
             window.removeEventListener('scroll', scrollhandler)
         };
     }, []);
@@ -137,6 +141,9 @@ const Header = (props) => {
                         <div className="header__menu__item header__menu__right__item">
                             <Link to="/cart">
                                 <i className="bx bx-shopping-bag"></i>
+                                <div className='_quantityProductCart'>
+                                    <span>{quantityInCart}</span>
+                                </div>
                             </Link>
                         </div>
                         {

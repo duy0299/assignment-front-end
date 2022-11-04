@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import service, {sizePage} from './setingAPI';
 
 const productModelService = {
@@ -20,6 +18,15 @@ const productModelService = {
 
     getMostPopularProduct : async () => {
       return await service.get("/models/most-popular")
+    },
+
+    getByCategories : async (categoryId, page) => {
+      return await service.get("/models/by-category/"+categoryId, {
+        params: {
+          page: page,
+          size: sizePage
+        }
+      })
     },
 
     search : async (nameProduct, page) => {

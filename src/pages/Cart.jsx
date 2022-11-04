@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { Link } from 'react-router-dom'
 
@@ -8,36 +8,49 @@ import Button from '../components/Button'
 
 import productData from '../assets/fake-data/products'
 import numberWithCommas from '../utils/numberWithCommas'
+import cartSession from '../utils/cartSession'
+import formatVND from '../utils/formatVND'
+// let cartItems = cartSession.getCart()
 
 const Cart = () => {
-    const relatedProducts = productData.getAllProducts()
-    let itemIncart = new Array();
-    for (let i in relatedProducts) {
-        
-        itemIncart.push(
-            {
-                id: i,
-                slug: relatedProducts[i].slug,
-                size: relatedProducts[i].size,
-                price: relatedProducts[i].price,
-                quantity: 8
-            }
-        );
-    }
 
-    const cartItems = itemIncart;
+    const [load, setLoad] = useState(false)
 
-    const [cartProducts, setCartProducts] = useState(productData.getCartItemsInfo(cartItems))
+    // const cartItems = cartSession.getCart()
+
+    const [cartProducts, setCartProducts] = useState(cartSession.getCart())
 
     const [totalProducts, setTotalProducts] = useState(0)
 
     const [totalPrice, setTotalPrice] = useState(0)
 
+    const changeLoad = useCallback(()=>{
+        if(load){
+            setLoad(false)
+        }else{
+            setLoad(true)
+        }
+    })
+
     useEffect(() => {
-        setCartProducts(productData.getCartItemsInfo(cartItems))
-        setTotalPrice(cartItems.reduce((total, item) => total + (Number(item.quantity) * Number(item.price)), 0))
-        setTotalProducts(cartItems.reduce((total, item) => total + Number(item.quantity), 0))
-    }, [cartItems])
+        const productIncart = cartSession.getCart();
+       
+        if(productIncart){
+            let total = 0;
+            setCartProducts(productIncart)
+            
+            for (let i of productIncart) {
+                total += i.price * i.quantity;
+            }
+            setTotalPrice(total)
+            setTotalProducts(productIncart.length)
+        }else{
+            setTotalPrice(0)
+            setTotalProducts(0)
+        }
+        
+        
+    }, [load])
 
     return (
         <Helmet title="Giỏ hàng">
@@ -48,14 +61,17 @@ const Cart = () => {
                             Bạn đang có {totalProducts} sản phẩm trong giỏ hàng
                         </p>
                         <div className="cart__info__txt__price">
-                            <span>Thành tiền:</span> <span>{numberWithCommas(Number(totalPrice))}</span>
+                            <span>Thành tiền:</span> <span>{formatVND(numberWithCommas(Number(totalPrice))) }</span>
                         </div>
                     </div>
                     <div className="cart__info__btn">
                         <Button size="block">
-                            Đặt hàng
+                            <Link to="/checkout">
+                                Đặt hàng
+                            </Link>
                         </Button>
-                        <Link to="/catalog">
+                        
+                        <Link to="/catalog/1">
                             <Button size="block">
                                 Tiếp tục mua hàng
                             </Button>
@@ -65,9 +81,12 @@ const Cart = () => {
                 </div>
                 <div className="cart__list">
                     {
-                        cartProducts.map((item, index) => (
-                            <CartItem item={item} key={index}/>
-                        ))
+                        (cartProducts)?cartProducts.map((item, index) => (
+                            <CartItem item={item} key={index} callBack={changeLoad}/>
+                        )):
+                        <div className='text-list-empty'>
+                            <p>Hiện Tại Chưa Có Sản Phẩm</p>
+                        </div>
                     }
                 </div>
             </div>

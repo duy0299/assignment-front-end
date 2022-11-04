@@ -9,7 +9,7 @@ import formatVND from '../utils/formatVND'
 import cookies from '../utils/cookies';
 import { Link } from 'react-router-dom'
 import wishlistService from '../service/wishlistService'
-
+import cartSession from '../utils/cartSession'
 
 const user = (cookies.getUser()!==null)?cookies.getUser():"";
 
@@ -17,8 +17,10 @@ const user = (cookies.getUser()!==null)?cookies.getUser():"";
 const ProductView = props => {
     let productModel = props.productModel
     
+    // main image review
     const [previewImg, setPreviewImg] = useState(productModel.listImages[0])
     const [descriptionExpand, setDescriptionExpand] = useState(false)
+    // main product
     const [product, setProduct] = useState(undefined)
     const [quantity, setQuantity] = useState(1)
     
@@ -70,7 +72,6 @@ const ProductView = props => {
                     console.log(error);
                 })
     })
-
     const updateQuantity = (type) => {
         if (type === 'plus') {
             setQuantity(quantity + 1)
@@ -80,28 +81,29 @@ const ProductView = props => {
     }
     
     const check = () => {
-        if (product === undefined) {
-            alert('Vui lòng chọn kích cỡ!')
+        if (product === undefined ||  product === null) {
+            swal("chú ý", 'Bạn chưa chọn kích thước', "warning");
             return false
         }
         return true
     }
 
-    const addToCart = () => {
-        // if (check()) {
-        //     let newItem = {
-        //         slug: productModel.slug,
-        //         product: product,
-        //         price: productModel.price,
-        //         quantity: quantity
-        //     }
-            // if (dispatch(addItem(newItem))) {
-            //     alert('Success')
-            // } else {
-            //     alert('Fail')
-            // }
-        // }
-    }
+    const addToCart = useCallback(() => {
+        console.log(quantity);
+        console.log(product);
+        
+        if (check()) {
+            let item = {
+                productId: product.id,
+                name: product.name,
+                avatar: product.avatar,
+                price: product.currentPrice,
+                size: product.size.name,
+                quantity: quantity
+            }
+            cartSession.addToCart(item,  quantity, "default");
+        }
+    }, [quantity, product])
 
     const goToCart = () => {
         if (check()) {
@@ -122,10 +124,7 @@ const ProductView = props => {
         setProduct(undefined)
     }, [productModel])
 
-    useEffect(() => {
-       
-    })
-
+ 
 
  
 

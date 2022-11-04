@@ -1,31 +1,31 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import swal from 'sweetalert'
 
 import Helmet from '../components/Helmet'
 import CheckBox from '../components/CheckBox'
 
-import category from '../assets/fake-data/category'
-import size from '../assets/fake-data/product-size'
 import Button from '../components/Button'
-import InfinityList from '../components/InfinityList'
 
 import productModelService  from '../service/productModelService'
 import Grid from '../components/Grid'
 import ProductCard from '../components/ProductCard'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import PageCounter from '../components/PageCounter'
+import Dropdown from '../components/Dropdown'
 
+import size from '../assets/fake-data/product-size'
+import categoriesService from '../service/categoriesService'
+import sizeService from '../service/sizeService'
 
 const Catalog = () => {
     const initFilter = {
-        category: [],
         size: []
     }
     const counterPageRef = useRef(null)
     const params = useParams();
     const [products, setProducts] = useState(undefined)
+    const [categories, setCategories] = useState(undefined)
+    const [sizes, setSizes] = useState(undefined)
     const [filter, setFilter] = useState(initFilter)
-    const [currentPage, setCurrentPage] = useState(params.page)
     const [totalPage, setTotalPage] = useState(1)
     const [arrTotalPage, setArrTotalPage] = useState(new Array(1))
 
@@ -35,28 +35,116 @@ const Catalog = () => {
     const loadListProduct = useCallback(
         () => {
             if(!Number.isNaN(params.page)){
-                productModelService.getAllByPage(params.page)
-                .then(function (response) {
-                    console.log(response.data);
-                    setProducts(response.data.result)
-                    setTotalPage(response.data.totalPage)
-                    setArrTotalPage((e)=>{
-                        e = new Array();
+                if(params.id === undefined){
+                    productModelService.getAllByPage(params.page)
+                    .then(function (response) {
                         console.log(response.data);
-                        for (let i = 1; i < response.data.totalPage+1; i++) {
-                            e.push(i)
-                        }
-                        return e;
+                        setProducts(response.data.result)
+                        setTotalPage(response.data.totalPage)
+                        setArrTotalPage((e)=>{
+                            e = new Array();
+                            console.log(response.data);
+                            for (let i = 1; i < response.data.totalPage+1; i++) {
+                                e.push(i)
+                            }
+                            return e;
+                        })
+                        
                     })
-                    
-                })
-                .catch(function (error) {
-                    console.log(error.message);
-                    return null
-                });
+                    .catch(function (error) {
+                        if(error.response.data){
+                            if(error.response.data.message == null){
+                                swal("Lỗi", error.response.data.result, "error");
+                            }else{
+                                swal("Lỗi", error.response.data.message, "error");
+                            }
+                        }else{
+                            swal("Lỗi", error.message, "error");
+                        }
+                        return null
+                    });
+                }else{
+                    productModelService.getByCategories(params.id,params.page)
+                    .then(function (response) {
+                        setProducts(response.data.result)
+                        setTotalPage(response.data.totalPage)
+                        setArrTotalPage((e)=>{
+                            e = [];
+                            for (let i = 1; i < response.data.totalPage+1; i++) {
+                                e.push(i)
+                            }
+                            return e;
+                        })
+                        
+                    })
+                    .catch(function (error) {
+                        if(error.response.data){
+                            if(error.response.data.message == null){
+                                swal("Lỗi", error.response.data.result, "error");
+                            }else{
+                                swal("Lỗi", error.response.data.message, "error");
+                            }
+                        }else{
+                            swal("Lỗi", error.message, "error");
+                        }
+                        return null
+                    });
+                }
+                
             }
         },
-        [params.page]
+        [params]
+    )
+    const loadListCategories = useCallback(
+        () => {
+            categoriesService
+                .getAll()
+                .then(function (response) {
+                    let result = new Array();
+                    for (const data of response.data.result) {
+                        if(data.parentCategoriesId === null){
+                            result.push(data);
+                        }
+                    }
+                    console.log(result);
+                    setCategories(result)
+                })
+                .catch(function (error) {
+                    if(error.response.data){
+                        if(error.response.data.message == null){
+                            swal("Lỗi", error.response.data.result, "error");
+                        }else{
+                            swal("Lỗi", error.response.data.message, "error");
+                        }
+                    }else{
+                        swal("Lỗi", error.message, "error");
+                    }
+                    return null
+                });
+        },
+        []
+    )
+    const loadListSizes = useCallback(
+        () => {
+            sizeService
+                .getAll()
+                .then(function (response) {
+                    setSizes(response.data.result)
+                })
+                .catch(function (error) {
+                    if(error.response.data){
+                        if(error.response.data.message == null){
+                            swal("Lỗi", error.response.data.result, "error");
+                        }else{
+                            swal("Lỗi", error.response.data.message, "error");
+                        }
+                    }else{
+                        swal("Lỗi", error.message, "error");
+                    }
+                    return null
+                });
+        },
+        []
     )
 
     const filterSelect = (type, checked, item) => {
@@ -105,60 +193,54 @@ const Catalog = () => {
         },
         [filter, products],
     )
-    const changePageCounter = useCallback(
-        (e) => {
-           
-            let value =e.target.outerText
-            let url = history.pathname;
-            url = url.replace("/"+params.page, "/"+value)
-            history.pathname = url
-            console.log( history.pathname );
-            params.page = value;
-            navigate(url);
-        },
-        [],
-    )
+    // const changePageCounter = useCallback(
+    //     ,
+    //     [],
+    // )
     const nextPageCounter = useCallback(
         (e) => {
-            
+            console.log({historyPathname:history.pathname, totalPage, paramsPage:params.page});
             let url = history.pathname;
             let paramPage = Number.parseInt(params.page) +1
             url = url.replace("/"+params.page, "/"+paramPage)
-            if(totalPage <= params.page){
+            if(Number.parseInt(totalPage) <= Number.parseInt(params.page)){
                 swal("Chú ý", "bạn đang ở trang cuối", "warning");
                 return 0;
             }
             history.pathname = url
-            console.log( history.pathname );
             params.page = paramPage;
+            console.log({historyPathname:history.pathname, totalPage, paramsPage:params.page});
             navigate(url);
         },
         [],
     )
     const prePageCounter = useCallback(
         (e) => {
+            console.log({historyPathname:history.pathname, totalPage, paramsPage:params.page});
             let url = history.pathname;
             let paramPage = Number.parseInt(params.page) -1
             url = url.replace("/"+params.page, "/"+paramPage)
-            if(0 == params.page){
+            
+            if(1 === Number.parseInt(params.page)){
                 swal("Chú ý", "bạn đang ở trang đầu", "warning");
-                return 0;
+                return null;
             }
             history.pathname = url
-            console.log( history.pathname );
             params.page = paramPage;
-            console.log();
+            console.log({historyPathname:history.pathname, totalPage, paramsPage:params.page});
             navigate(url);
         },
         [],
     )
-
-
-
     
     useEffect(() => {
-        loadListProduct()
+        loadListProduct();
     }, [params]);
+
+    useEffect(() => {
+        loadListCategories();
+        loadListSizes();
+    }, []);
 
     useEffect(() => {
         updateProducts()
@@ -184,17 +266,15 @@ const Catalog = () => {
                             danh mục sản phẩm
                         </div>
                         <div className="catalog__filter__widget__content">
-                            {
-                                category.map((item, index) => (
-                                    <div key={index} className="catalog__filter__widget__content__item">
-                                        <CheckBox
-                                            label={item.display}
-                                            onchange={(input) => filterSelect("CATEGORY", input.checked, item)}
-                                            checked={filter.category.includes(item.categorySlug)}
-                                        />
-                                    </div>
-                                ))
-                            }
+                            <nav className='animated _bounceInDown'>
+                                <ul>
+                                    {
+                                        (categories)?categories.map((item, index)=>(
+                                            <Dropdown parent={item}/>
+                                        )):<Dropdown parent={undefined} />
+                                    }
+                                </ul>
+                            </nav>
                         </div>
                     </div>
 
@@ -204,15 +284,15 @@ const Catalog = () => {
                         </div>
                         <div className="catalog__filter__widget__content">
                             {
-                                size.map((item, index) => (
+                                (sizes)?sizes.map((item, index) => (
                                     <div key={index} className="catalog__filter__widget__content__item">
                                         <CheckBox
-                                            label={item.display}
+                                            label={item.name}
                                             onchange={(input) => filterSelect("SIZE", input.checked, item)}
-                                            checked={filter.size.includes(item.size)}
+                                            checked={filter.size.includes(item.id)}
                                         />
                                     </div>
-                                ))
+                                )):null
                             }
                         </div>
                     </div>
@@ -230,22 +310,32 @@ const Catalog = () => {
                     {/* <InfinityList
                         data={products}
                     /> */}
-                     <Grid 
-                        col={4}
-                        mdCol={2}
-                        smCol={1}
-                        gap={20}
-                    >
-                        
-                        {
-                           (products)? products.map((item, index)=>(
-                                <ProductCard
-                                    product={item}
-                                    key={index}
-                                />
-                            )):null
-                        }
-                    </Grid>
+                    {
+                        (products)?
+                        <Grid 
+                            col={4}
+                            mdCol={2}
+                            smCol={1}
+                            gap={20}
+                        >
+                            {
+                                (products.length!==0)?  
+                                    products.map((item, index)=>(
+                                        <ProductCard
+                                            product={item}
+                                            key={index}
+                                        />
+                                    ))
+                                    :
+                                    <div className='text-list-empty'>
+                                        <p>Hiện Tại Chưa Có Sản Phẩm</p>
+                                    </div>
+                            }
+                        </Grid>
+                        :null
+
+                    }
+                     
                     
                     <div className='_pageCounter' ref={counterPageRef}>
                         <a href="javascript:void(0)">
@@ -257,7 +347,20 @@ const Catalog = () => {
                         {
                             (arrTotalPage !== null)?arrTotalPage.map((item, index)=>(
                                 <a href="javascript:void(0)">
-                                    <div className={`_pageCounter__${(item==params.page)?"active-page":"page"}`}  onClick={changePageCounter}>
+                                    <div className={`_pageCounter__${(item==params.page)?"active-page":"page"}`}  
+                                        onClick={
+                                            (e) => {
+                                                
+                                                let url = history.pathname;
+                                                console.log(history.pathname);
+                                                console.log(params.page);
+                                                console.log(item);
+                                                url = url.replace("/"+params.page, "/"+item)
+                                                history.pathname = url
+                                                params.page = item;
+                                                navigate(url);
+                                        }}
+                                    >
                                         <p>{item}</p>
                                     </div>
                                 </a>

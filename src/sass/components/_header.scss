@@ -141,3 +141,22 @@
         }
     }
 }
+
+._quantityProductCart{
+    @include flex(center, center);
+    position: relative;
+    width:25px;
+    height:25px;
+    float: right;
+    border: 1px solid #ada9a9;
+    border-radius: 45%;
+    z-index: -1;
+    left: -10px;
+    top: -12px;
+    background-color: rgb(181, 233, 233);
+
+    span{
+        font-size: 18px;
+        font-weight: bold;
+    }
+}
