@@ -101,7 +101,7 @@ const ProductView = props => {
                 size: product.size.name,
                 quantity: quantity
             }
-            cartSession.addToCart(item,  quantity, "default");
+            cartSession.addToCart(item, "default");
         }
     }, [quantity, product])
 

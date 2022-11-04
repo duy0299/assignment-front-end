@@ -125,7 +125,7 @@ const Header = (props) => {
                                 <div 
                                 key={index}   
                                 className={  `header__menu__item 
-                                header__menu__left__item' ${ index === activeNav ? 'active':''}`}
+                                header__menu__left__item' ${ item === activeNav ? 'active':''}`}
                                 onClick={menuToggle}>
                                     <Link to={item.path}>
                                         <span>{item.display}</span>

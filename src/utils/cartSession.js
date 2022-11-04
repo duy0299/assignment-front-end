@@ -60,7 +60,6 @@ const cartSession = {
     getCart(){
         let productsInCart = JSON.parse(sessionStorage.getItem(cartName));
         if (productsInCart) {
-            console.log("ok");
             return productsInCart;
         }
         return [];
@@ -74,6 +73,10 @@ const cartSession = {
                 }
             }
         sessionStorage.setItem(cartName, JSON.stringify(productsInCart));
+    },
+
+    clearCart(){
+        sessionStorage.clear()
     }
 
 }

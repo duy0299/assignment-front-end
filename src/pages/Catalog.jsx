@@ -1,5 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import swal from 'sweetalert'
 
 import Helmet from '../components/Helmet'
@@ -10,13 +12,13 @@ import Button from '../components/Button'
 import productModelService  from '../service/productModelService'
 import Grid from '../components/Grid'
 import ProductCard from '../components/ProductCard'
-import Dropdown from '../components/Dropdown'
 
-import size from '../assets/fake-data/product-size'
 import categoriesService from '../service/categoriesService'
 import sizeService from '../service/sizeService'
 
 const Catalog = () => {
+    const  history = useLocation();
+    const navigate = useNavigate();
     const initFilter = {
         size: []
     }
@@ -29,8 +31,7 @@ const Catalog = () => {
     const [totalPage, setTotalPage] = useState(1)
     const [arrTotalPage, setArrTotalPage] = useState(new Array(1))
 
-    const  history = useLocation();
-    const navigate = useNavigate();
+    
 
     const loadListProduct = useCallback(
         () => {
@@ -52,7 +53,7 @@ const Catalog = () => {
                         
                     })
                     .catch(function (error) {
-                        if(error.response.data){
+                        if(error.response){
                             if(error.response.data.message == null){
                                 swal("Lỗi", error.response.data.result, "error");
                             }else{
@@ -78,7 +79,7 @@ const Catalog = () => {
                         
                     })
                     .catch(function (error) {
-                        if(error.response.data){
+                        if(error.response){
                             if(error.response.data.message == null){
                                 swal("Lỗi", error.response.data.result, "error");
                             }else{
@@ -110,7 +111,7 @@ const Catalog = () => {
                     setCategories(result)
                 })
                 .catch(function (error) {
-                    if(error.response.data){
+                    if(error.response){
                         if(error.response.data.message == null){
                             swal("Lỗi", error.response.data.result, "error");
                         }else{
@@ -132,7 +133,7 @@ const Catalog = () => {
                     setSizes(response.data.result)
                 })
                 .catch(function (error) {
-                    if(error.response.data){
+                    if(error.response){
                         if(error.response.data.message == null){
                             swal("Lỗi", error.response.data.result, "error");
                         }else{
@@ -232,6 +233,17 @@ const Catalog = () => {
         },
         [],
     )
+
+    const toggleTab = useCallback(
+        (e) => {
+            let list =  document.getElementsByClassName("_titleCategories");
+            for (const i of list) {
+               i.classList.remove("_choose");
+            }
+            e.target.classList.add("_choose")
+        },
+        [],
+    )
     
     useEffect(() => {
         loadListProduct();
@@ -269,9 +281,53 @@ const Catalog = () => {
                             <nav className='animated _bounceInDown'>
                                 <ul>
                                     {
-                                        (categories)?categories.map((item, index)=>(
-                                            <Dropdown parent={item}/>
-                                        )):<Dropdown parent={undefined} />
+                                        (categories)?categories.map((item, index)=>{
+                                            if(item.listChildren.length==0){
+                                                return (
+                                                    <Accordion TransitionProps={{ unmountOnExit: false }}>
+                                                        <AccordionSummary
+                                                            aria-controls="panel1a-content"
+                                                            id="panel1a-header"
+                                                        >
+                                                            <Link to={`/catalog/category/${item.id}/1`}>
+                                                                <Typography >
+                                                                    <span onClick={toggleTab} className='_titleCategories'>{item.name}</span> 
+                                                                </Typography>
+                                                            </Link>
+                                                        </AccordionSummary>
+                                                    </Accordion>
+                                                )
+                                            }else{
+                                                return (
+                                                    <Accordion>
+                                                        {/* parent */}
+                                                        <AccordionSummary
+                                                            expandIcon={<ExpandMoreIcon />}
+                                                            aria-controls="panel1a-content"
+                                                            id="panel1a-header"
+                                                        >
+                                                        <Link to={`/catalog/category/${item.id}/1`}>
+                                                                <Typography >
+                                                                    <span onClick={toggleTab} className='_titleCategories'>{item.name}</span> 
+                                                                </Typography>
+                                                            </Link>
+                                                        </AccordionSummary>
+                                                        {/* children */}
+                                                        {
+                                                            item.listChildren.map((item, index)=>(
+                                                                <AccordionDetails>
+                                                                    <Link to={`/catalog/category/${item.id}/1`}>
+                                                                        <Typography >
+                                                                            <span onClick={toggleTab} className='_titleCategories'>{item.name}</span> 
+                                                                        </Typography>
+                                                                    </Link>
+                                                                </AccordionDetails>
+                                                            ))
+                                                        }
+                                                    </Accordion>
+                                                )
+                                            }
+                                        }): null
                                     }
                                 </ul>
                             </nav>

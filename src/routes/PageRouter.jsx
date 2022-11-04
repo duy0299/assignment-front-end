@@ -10,7 +10,9 @@ import Layout from '../pages/Layout'
 import Login from '../pages/Login'
 import Register from '../pages/Register'
 import Wishlist from '../pages/Wishlist'
-import Checkout from '../pages/checkout'
+import Checkout from '../pages/Checkout'
+import LayoutAd from '../pages/admin/LayoutAd'
+import ListUserAd from '../pages/admin/ListUserAd'
 
 const HomePage = <Layout><Home/></Layout>;
 const ProductPage = <Layout><Product/></Layout>;
@@ -36,7 +38,15 @@ const PageRouter = () => {
                 <Route path='/wishlist' element={WishlistPage}/>
                 <Route path='/catalog/:page' element={CatalogPage}/>
                 <Route path='/catalog/category/:id/:page' element={CatalogPage}/>
+
+
+                <Route path='/admin/' element={<LayoutAd/>} ></Route>
+                <Route path='/admin/users/list'  element={<LayoutAd><ListUserAd/></LayoutAd>}/>
+                
+
+                
             </Routes>
+            
         </BrowserRouter>
     )
 }

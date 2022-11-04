@@ -5,7 +5,6 @@ const user = (cookies.getUser()!==null)?cookies.getUser():"";
 const urlAPI = "http://localhost:8080";
 
 const sizePage = 4;
-console.log(user.token);
 
 
 let service = axios.create({

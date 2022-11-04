@@ -40,10 +40,14 @@ const Register = () => {
                     } ) ;
                 })
                 .catch(function (error) {
-                    if(error.response.data.message == null){
-                        swal("Lỗi", error.response.data.result, "error");
+                    if(error.response){
+                        if(error.response.data.message == null){
+                            swal("Lỗi", error.response.data.result, "error");
+                        }else{
+                            swal("Lỗi", error.response.data.message, "error");
+                        }
                     }else{
-                        swal("Lỗi", error.response.data.message, "error");
+                        swal("Lỗi", error.message, "error");
                     }
                     
                     console.log(error);

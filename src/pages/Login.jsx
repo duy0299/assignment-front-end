@@ -44,9 +44,7 @@ const Form = props => {
         e.preventDefault();
         authService.login(email, password)
             .then(function (response) {
-                console.log(response.data.result);
                 cookies.setUser(response.data.result);
-                // swal("Thành công", "success");
                 swal ( {
                         title: "Thành  công",
                         icon: "success",
@@ -60,7 +58,7 @@ const Form = props => {
             })
             .catch(function (error) {
               swal("Lỗi", "Email hoặc mật khẩu không đúng", "error");
-                console.log(error);
+              console.log(error);
             })
         
     };

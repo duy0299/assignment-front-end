@@ -1,42 +1,45 @@
 import service from './setingAPI';
 
-const cartService = {
+const orderService = {
     getAll : async () => {
-        const response = await service.get("/carts")
+        const response = await service.get("/orders")
         return response;
       },
   
   
-    addToCart : async (productId, quantity) => {
-        const response = await service.post("/cart", {
-            productId: productId,
-            quantity: quantity
-        })
+    getById : async (id) => {
+        const response = await service.get("/order/"+id)
           return response;
     },
     
-    upQuantity : async (productId, quantity) => {
-        const response = await service.put("/cart/up", {
-            productId: productId,
-            quantity: quantity
+    insert : async (address, note, cartProducts) => {
+      let listProduct = [];
+      for (const i in cartProducts) {
+        let productCart = {
+          productId: i.productId,
+          quantity: i.quantity,
+        }
+        listProduct.push(productCart);
+      }
+     
+        const response = await service.post("/order", {
+            address: address,
+            listProduct: cartProducts,
+            note: note
         })
           return response;
     },
-    downQuantity : async (productId, quantity) => {
-        const response = await service.put("/cart/down", {
-            productId: productId,
-            quantity: quantity
+    updateStatus : async (id, status) => {
+        const response = await service.put("/order/status/"+id, {
+            status: status
         })
           return response;
     },
-    changeQuantity : async (productId, quantity) => {
-        const response = await service.put("/cart/change", {
-            productId: productId,
-            quantity: quantity
-        })
+    delete : async (id) => {
+        const response = await service.delete("/order/"+id)
           return response;
     },
 }
 
 
-export default cartService
+export default orderService

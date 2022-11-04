@@ -9,6 +9,7 @@ import ProductView from '../components/ProductView'
 import productModelService  from '../service/productModelService'
 import FormReview from '../components/FormReview'
 import { useParams } from 'react-router-dom'
+import swal from 'sweetalert'
 
 
 
@@ -25,7 +26,15 @@ const Product = props => {
                 setProductModel(response.data.result)
             })
             .catch(function (error) {
-                console.log(error.message);
+                if(error.response){
+                    if(error.response.data.message == null){
+                        swal("Lỗi", error.response.data.result, "error");
+                    }else{
+                        swal("Lỗi", error.response.data.message, "error");
+                    }
+                }else{
+                    swal("Lỗi", error.message, "error");
+                }
                 return null
             });
         },
@@ -38,7 +47,15 @@ const Product = props => {
                 setMostPopularProducts(response.data.result)
             })
             .catch(function (error) {
-                console.log(error.message);
+                if(error.response.data){
+                    if(error.response.data.message == null){
+                        swal("Lỗi", error.response.data.result, "error");
+                    }else{
+                        swal("Lỗi", error.response.data.message, "error");
+                    }
+                }else{
+                    swal("Lỗi", error.message, "error");
+                }
                 return null
             });
         },
@@ -80,7 +97,7 @@ const Product = props => {
             </Section>
             <Section>
                 <SectionTitle>
-                    Khám phá thêm
+                    Những Mẫu phổ biến
                 </SectionTitle>
                 <SectionBody>
                     <Grid

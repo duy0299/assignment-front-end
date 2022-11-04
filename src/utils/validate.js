@@ -40,7 +40,30 @@ const validate = {
             return false;
         }
         return true;
+    },
+
+    postOrder(address, note, cartProducts){
+        if (address.trim() === "") {
+            swal("Chú ý", "địa chỉ chưa điền", "warning");
+            return false;
+        }
+
+        if (cartProducts.length < 1) {
+            swal("Chú ý", "Giỏ hàng đang rỗng", "warning");
+            return false;
+        }
+        if (address.length > 100) {
+            swal("Chú ý", "địa chỉ quá dài", "warning");
+            return false;
+        }
+        if (note.length > 100) {
+            swal("Chú ý", "Ghi chú quá dài", "warning");
+            return false;
+        }
+
+        return true;
     }
+
 }
 
 
