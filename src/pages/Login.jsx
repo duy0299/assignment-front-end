@@ -47,7 +47,6 @@ const Form = props => {
                 cookies.setUser(response.data.result);
                 let flat = false;
                 for (const role of response.data.result.listRole) {
-                  console.log(role);
                   if(role.authority === "ADMIN" || role.authority === "FEEDBACK_MANAGER" || 
                     role.authority === "ORDER_MANAGER" ||  role.authority === "WAREHOUSE_MANAGER" || 
                     role.authority === "USER_MANAGER"  ){

@@ -18,7 +18,7 @@ import sizeService from '../../service/sizeService';
 const ListSizeAd = () => {
   const [sizes, setSizes] = useState(undefined);
 
-  const loadUsers = useCallback(()=>{
+  const loadSizes = useCallback(()=>{
     sizeService.getAll()
         .then((response)=>{
           setSizes(response.data.result)
@@ -33,7 +33,7 @@ const ListSizeAd = () => {
 
   useEffect(() => {
     
-    loadUsers()
+    loadSizes()
   }, []);
 
   // useEffect(() => {

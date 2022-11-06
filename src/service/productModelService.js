@@ -1,4 +1,4 @@
-import service, {sizePage} from './setingAPI';
+import service, {serviceImage, sizePage} from './setingAPI';
 
 const productModelService = {
   
@@ -64,6 +64,12 @@ const productModelService = {
           size: sizePage
         }
       })
+      return response;
+    },
+
+    insertWithProducts : async (data) => {
+      console.log(data);
+      const response = await serviceImage.post("/model/with-products", data)
       return response;
     },
     

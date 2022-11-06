@@ -20,6 +20,7 @@ import ListOrderAd from '../pages/admin/ListOrderAd'
 import ListRatingAd from '../pages/admin/ListRatingAd'
 import ListProductAd from '../pages/admin/ListProductAd'
 import ListFeedbackAd from '../pages/admin/ListFeedbackAd'
+import AddModelAd from '../pages/admin/AddModelAd'
 
 const HomePage = <Layout><Home/></Layout>;
 const ProductPage = <Layout><Product/></Layout>;
@@ -56,6 +57,7 @@ const PageRouter = () => {
                 <Route path='/admin/orders/list/:page'  element={<LayoutAd><ListOrderAd/></LayoutAd>}/>
                 <Route path='/admin/ratings/list/:page'  element={<LayoutAd><ListRatingAd/></LayoutAd>}/>
                 <Route path='/admin/feedback/list/:page'  element={<LayoutAd><ListFeedbackAd/></LayoutAd>}/>
+                <Route path='/admin/model/add'  element={<LayoutAd><AddModelAd/></LayoutAd>}/>
                 
 
                 

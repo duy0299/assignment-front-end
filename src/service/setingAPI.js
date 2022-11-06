@@ -7,14 +7,23 @@ const urlAPI = "http://localhost:8080";
 const sizePage = 5;
 console.log(user);
 
-let service = axios.create({
+const service = axios.create({
     baseURL: urlAPI,
     headers: {
         "Authorization": `Bearer ${user.token}`
       }
     }
 )
+const serviceImage = axios.create({
+    baseURL: urlAPI,
+    headers: {
+      "Authorization": `Bearer ${user.token}`
+    },
+    enctype: 'multipart/form-data'
+  }
+)
+
 
 export default service;
 
-export {sizePage}
+export {sizePage, serviceImage}
