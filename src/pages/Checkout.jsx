@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import swal from 'sweetalert';
 import Grid from '../components/Grid';
-import orderService from '../service/OrderService';
+import orderService from '../service/orderService';
 import userService from '../service/userService';
 import cartSession from '../utils/cartSession'
 import formatVND from '../utils/formatVND';

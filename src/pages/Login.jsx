@@ -45,15 +45,35 @@ const Form = props => {
         authService.login(email, password)
             .then(function (response) {
                 cookies.setUser(response.data.result);
-                swal ( {
-                        title: "Thành  công",
-                        icon: "success",
-                        button: "Về trang chủ"
-                      }  )
-                  . then ( ( value ) =>  { 
+                let flat = false;
+                for (const role of response.data.result.listRole) {
+                  console.log(role);
+                  if(role.authority === "ADMIN" || role.authority === "FEEDBACK_MANAGER" || 
+                    role.authority === "ORDER_MANAGER" ||  role.authority === "WAREHOUSE_MANAGER" || 
+                    role.authority === "USER_MANAGER"  ){
+                        flat = true; 
+                        break;
+                  }
+                }
+                if(flat){
+                  swal({
+                      title: "Thành  công",
+                      icon: "success",
+                      button: "Vào trang Admin"
+                      })
+                  .then(( value ) =>  { 
+                    navigate("/admin")
+                  } ) ;
+                }else{
+                  swal({
+                      title: "Thành  công",
+                      icon: "success",
+                      button: "Về trang chủ"
+                    })
+                  .then(( value ) =>  { 
                     navigate("/home")
                   } ) ;
-
+                }
                 
             })
             .catch(function (error) {

@@ -1,6 +1,6 @@
 ._layoutAdmin{
     position: absolute;
-    background-color: rgb(209, 202, 202);
+    background-color: rgb(252, 252, 252);
     height: 100%;
     width: 100%;
 
@@ -16,9 +16,45 @@
         width: 19rem;
     }
 
-    ._ad-lists-user{
-        margin: 10%;
+    ._ad-lists-user, ._ad-lists-model, ._ad-lists-table{
+
+        margin: 1.5rem;
+
+        td{
+          font-size: 14px;
+        }
+        th{
+          font-size: 16px;
+        }
+        .bxs-heart{
+          font-size: 13px;
+          color: rgb(246, 37, 253);
+        }
+        .bxs-star{
+          color: rgb(255, 196, 0);
+          font-size: 13px;
+        }
+
+        h1{
+          text-align: center;
+          margin: 1.5rem;
+        }
+
+        ._pagination{
+          font-size: 15px;margin-bottom: 1rem;
+          left: 1rem;
+        }
     }
     
 
+}
+
+
+// color text Status
+._status-0{
+  color: red;
+}
+._status-1{
+  color: rgb(14, 204, 14);
+  font-weight: bold;
 }

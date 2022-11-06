@@ -1,11 +1,15 @@
-import service from './setingAPI';
+import service, { sizePage } from './setingAPI';
 
 const orderService = {
-    getAll : async () => {
-        const response = await service.get("/orders")
+    getAll : async (page) => {
+        const response = await service.get("/orders", {
+          params: {
+            page: page,
+            size: sizePage
+          }
+        })
         return response;
       },
-  
   
     getById : async (id) => {
         const response = await service.get("/order/"+id)

@@ -1,7 +1,6 @@
 const userKey = "userinfo";
 const cookies = {
     setUser(userInfo){
-        console.log("setCookies");
         document.cookie=userKey+"=" + JSON.stringify(userInfo);
     },
 
@@ -13,11 +12,8 @@ const cookies = {
             
             const lengthName = (userKey+"=").length
             const key = i.slice(0, lengthName)
-            console.log(key, userKey+"=");
             if (key === (userKey+"=")) {
-                
                 const value = i.slice(lengthName, i.length)
-                console.log(JSON.parse(value));
                 return JSON.parse(value);
             }
         }

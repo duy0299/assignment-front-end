@@ -1,6 +1,7 @@
-import { AppBar,  Avatar,  Box,  Grid,  IconButton, Menu, MenuItem, Paper, Toolbar, Tooltip, Typography } from '@mui/material';
+import { AppBar,  Avatar,  Box,  Divider,  Drawer,  Grid,  IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Toolbar, Tooltip, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MailIcon from '@mui/icons-material/Mail';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
 import React, { useEffect } from 'react'
 
 import TabMenuLeft from '../../components/admin/TabMenuLeft';
@@ -10,7 +11,6 @@ import { useState } from 'react';
 import { useCallback } from 'react';
 import swal from 'sweetalert';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from '@emotion/styled';
 // import cookies from '../../utils/cookies';
 
 
@@ -19,8 +19,7 @@ import styled from '@emotion/styled';
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const LayoutAd = (props) => {
     const navigate = useNavigate();
-    const  history = useLocation();
-
+    const [menu, setMenu] = useState(false);
     const [admin, SetAdmin] = useState(undefined)
     const [anchorElUser, setAnchorElUser] = useState(null);
     const handleOpenUserMenu = (event) => {
@@ -29,13 +28,17 @@ const LayoutAd = (props) => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-
+    const toggleDrawer = ( openOrClose) => (event) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+          return;
+        }
+        setMenu(openOrClose);
+    };
     const LoadAdmin = useCallback(()=>{
-        // cookies.getUser()
+        toggleDrawer(false)
         userService.getWithToken()
         .then((response)=>{
             for (const role of response.data.result.listRole) {
-                console.log(role)
                 if(role === "ADMIN" || role === "FEEDBACK_MANAGER" || role === "ORDER_MANAGER" || 
                     role === "WAREHOUSE_MANAGER" || role === "USER_MANAGER"  ){
                         SetAdmin(response.data.result);
@@ -64,17 +67,35 @@ const LayoutAd = (props) => {
                 navigate("/login")
             } ) ;
         })
-    },[])
+    })
+
+ 
 
     useEffect(() => {
         LoadAdmin();
-    
-    }, [history]);
+        setMenu(false)
+    }, []);
 
 
   return (
     <div className='_layoutAdmin'>
-        <Helmet title='Trang chủ'>
+        {/* Menu */}
+        <Drawer
+            anchor={"left"}
+            open={menu}
+            onClose={toggleDrawer(false)}
+        >
+            <Box
+                sx={{ width: 250 }}
+                role="presentation"
+                
+                onKeyDown={toggleDrawer(false)}
+            >
+                <TabMenuLeft closeMenu={()=>{toggleDrawer( false)}}/>
+
+            </Box>
+        </Drawer>
+        <Helmet title='Trang chủ' >
             <Box className='_headerAdmin' sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
                     <Toolbar>
@@ -84,9 +105,13 @@ const LayoutAd = (props) => {
                             color="inherit"
                             aria-label="menu"
                             sx={{ mr: 2 }}
+                            onClick={toggleDrawer(true)}
                         >
                             <MenuIcon />
+                            
+                            
                         </IconButton>
+                        
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             News
                         </Typography>
@@ -132,22 +157,10 @@ const LayoutAd = (props) => {
                     </Toolbar>
                 </AppBar>
             </Box>
-
-            <Box sx={{ flexGrow: 1 }}>
-                <Grid container spacing={1}>
-                    <Grid item xs={3}>
-                    
-                    </Grid>
-                    <Grid item xs={9}>
-                        <div className="_adMain">
-                            {props.children}
-                        </div>
-                    </Grid>
-                    
-                </Grid>
-            </Box>
-            <TabMenuLeft/>
-
+            <div className="_adMain">
+                {props.children}
+            </div>
+            
             
         </Helmet>  
     </div>

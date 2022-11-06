@@ -4,8 +4,8 @@ import cookies from '../utils/cookies';
 const user = (cookies.getUser()!==null)?cookies.getUser():"";
 const urlAPI = "http://localhost:8080";
 
-const sizePage = 4;
-
+const sizePage = 5;
+console.log(user);
 
 let service = axios.create({
     baseURL: urlAPI,

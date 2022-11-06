@@ -2,8 +2,8 @@ import service, {sizePage} from './setingAPI';
 
 const productModelService = {
   
-    getAllByPage : async (page) => {
-      const response = await service.get("/models", {
+    getAllBySatatus : async (page) => {
+      const response = await service.get("/models/status-true", {
           params: {
             page: page,
             size: sizePage
@@ -56,8 +56,14 @@ const productModelService = {
       return await service.get("/model/"+id)
     },
 
-    getByAllStatus : async () => {
-      const response = await service.get("/models/all-status")
+    getAll : async (page) => {
+      console.log(page, sizePage);
+      const response = await service.get("/models", {
+        params: {
+          page: page,
+          size: sizePage
+        }
+      })
       return response;
     },
     

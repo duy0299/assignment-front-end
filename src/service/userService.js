@@ -8,20 +8,26 @@ const userService = {
         return await service.get("/user/with-token")
     },
     
-    getAll : async () => {
-        return await service.get("/users")
+    getByPage : async (page) => {
+        console.log(page, sizePage);
+        return await service.get("/users",{
+            params: {
+              page: page,
+              size: sizePage
+            }
+          })
     },
     
-    // UpdateStatus : async (id, status) => {
-    //     return await service.put("/rating", {
-    //         id : id,
-    //         status : status
-    //     })
-    // },
+    UpdateStatus : async (id, status) => {
+        return await service.put("/user/"+id, {
+            id : id,
+            status : status
+        })
+    },
 
-    // delete : async (id) => {
-    //     return await service.delete("/rating/"+id)
-    // },
+    delete : async (id) => {
+        return await service.delete("/user//+id"+id)
+    },
 }
 
 

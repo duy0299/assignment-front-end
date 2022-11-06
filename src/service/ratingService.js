@@ -5,8 +5,13 @@ const ratingService = {
         return await service.get("/rating/"+id)
     },
     
-    getAll : async () => {
-        return await service.get("/ratings")
+    getAll : async (page) => {
+        return await service.get("/ratings", {
+            params: {
+              page: page,
+              size: sizePage
+            }
+          })
     },
     
     Insert : async (content, rating, modelId) => {
@@ -19,8 +24,7 @@ const ratingService = {
     },
     
     UpdateStatus : async (id, status) => {
-        return await service.put("/rating", {
-            id : id,
+        return await service.put("/rating/"+id, {
             status : status
         })
     },

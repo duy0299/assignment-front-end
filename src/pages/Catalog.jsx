@@ -37,7 +37,7 @@ const Catalog = () => {
         () => {
             if(!Number.isNaN(params.page)){
                 if(params.id === undefined){
-                    productModelService.getAllByPage(params.page)
+                    productModelService.getAllBySatatus(params.page)
                     .then(function (response) {
                         console.log(response.data);
                         setProducts(response.data.result)
