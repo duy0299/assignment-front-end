@@ -14,29 +14,26 @@ const categoriesService = {
 
     insert : async (name, description, parentCategoriesId) => {
       const response = await service.post("/category", {
-            params: {
-                name: name,
-                description: description,
-                parentCategoriesId: parentCategoriesId
-            }
+          name: name,
+          description: description,
+          parentCategoriesId: parentCategoriesId
       })
       return response;
     },
 
     update : async (id, name, description, parentCategoriesId) => {
+      let parent = (parentCategoriesId==='null')?null:parentCategoriesId;
       const response = await service.put("/category/"+id, {
-            params: {
-                name: name,
-                description: description,
-                parentCategoriesId: parentCategoriesId
-            }
+          name: name,
+          description: description,
+          parentCategoriesId: parent
       })
       return response;
     },
 
 
     delete : async (id) => {
-        return await service.get("/category/"+id)
+        return await service.delete("/category/"+id)
       },
     
 }

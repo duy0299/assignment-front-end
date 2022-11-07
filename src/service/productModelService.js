@@ -68,8 +68,27 @@ const productModelService = {
     },
 
     insertWithProducts : async (data) => {
-      console.log(data);
       const response = await serviceImage.post("/model/with-products", data)
+      return response;
+    },
+    updateInfo : async (id, name, description, priceRoot, categoriesID) => {
+      console.log(id, name, description, priceRoot, categoriesID);
+      const response = await serviceImage.put("/model/"+id+"/info", {
+        name:  name,
+        description: description,
+        priceRoot:  priceRoot,
+        categoriesID: categoriesID
+      })
+      return response;
+    },
+    updateStatus : async (id, status) => {
+      const response = await service.delete("/model/"+id+"/status", {
+        status: status
+      })
+      return response;
+    },
+    delete : async (id) => {
+      const response = await service.delete("/model/"+id)
       return response;
     },
     

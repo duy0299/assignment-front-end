@@ -14,18 +14,14 @@ const sizeService = {
 
     insert : async (name) => {
       const response = await service.post("/size", {
-            params: {
-                name: name
-            }
+        name: name
       })
       return response;
     },
 
     update : async (id, name) => {
       const response = await service.put("/size/"+id, {
-            params: {
-                name: name
-            }
+        name: name
       })
       return response;
     },

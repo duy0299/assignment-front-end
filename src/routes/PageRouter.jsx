@@ -13,14 +13,16 @@ import Wishlist from '../pages/Wishlist'
 import Checkout from '../pages/Checkout'
 import LayoutAd from '../pages/admin/LayoutAd'
 import ListUserAd from '../pages/admin/ListUserAd'
-import ListModelAd from '../pages/admin/ListModelAd'
+import ListModelAd from '../pages/admin/model/ListModelAd'
 import ListSizeAd from '../pages/admin/ListSizeAd'
-import ListCategoriesAd from '../pages/admin/ListCategoriesAd'
+import ListCategoriesAd from '../pages/admin/categories/ListCategoriesAd'
 import ListOrderAd from '../pages/admin/ListOrderAd'
 import ListRatingAd from '../pages/admin/ListRatingAd'
-import ListProductAd from '../pages/admin/ListProductAd'
+import ListProductAd from '../pages/admin/product/ListProductAd'
 import ListFeedbackAd from '../pages/admin/ListFeedbackAd'
-import AddModelAd from '../pages/admin/AddModelAd'
+import AddModelAd from '../pages/admin/model/AddModelAd'
+import EditModelAd from '../pages/admin/model/EditModelAd'
+import AddCategoryAd from '../pages/admin/categories/AddCategoryAd'
 
 const HomePage = <Layout><Home/></Layout>;
 const ProductPage = <Layout><Product/></Layout>;
@@ -49,15 +51,22 @@ const PageRouter = () => {
 
 
                 <Route path='/admin/' element={<LayoutAd/>} ></Route>
-                <Route path='/admin/users/list/:page'  element={<LayoutAd><ListUserAd/></LayoutAd>}/>
-                <Route path='/admin/models/list/:page'  element={<LayoutAd><ListModelAd/></LayoutAd>}/>
-                <Route path='/admin/products/list/:page'  element={<LayoutAd><ListProductAd/></LayoutAd>}/>
-                <Route path='/admin/sizes/list'  element={<LayoutAd><ListSizeAd/></LayoutAd>}/>
-                <Route path='/admin/categories/list'  element={<LayoutAd><ListCategoriesAd/></LayoutAd>}/>
-                <Route path='/admin/orders/list/:page'  element={<LayoutAd><ListOrderAd/></LayoutAd>}/>
-                <Route path='/admin/ratings/list/:page'  element={<LayoutAd><ListRatingAd/></LayoutAd>}/>
-                <Route path='/admin/feedback/list/:page'  element={<LayoutAd><ListFeedbackAd/></LayoutAd>}/>
-                <Route path='/admin/model/add'  element={<LayoutAd><AddModelAd/></LayoutAd>}/>
+
+                <Route path='/admin/sizes'  element={<LayoutAd><ListSizeAd/></LayoutAd>}/>
+                <Route path='/admin/categories'  element={<LayoutAd><ListCategoriesAd/></LayoutAd>}/>
+                <Route path='/admin/users/page/:page'  element={<LayoutAd><ListUserAd/></LayoutAd>}/>
+                <Route path='/admin/models/page/:page'  element={<LayoutAd><ListModelAd/></LayoutAd>}/>
+                <Route path='/admin/products/page/:page'  element={<LayoutAd><ListProductAd/></LayoutAd>}/>
+                <Route path='/admin/orders/page/:page'  element={<LayoutAd><ListOrderAd/></LayoutAd>}/>
+                <Route path='/admin/ratings/page/:page'  element={<LayoutAd><ListRatingAd/></LayoutAd>}/>
+                <Route path='/admin/feedbacks/page/:page'  element={<LayoutAd><ListFeedbackAd/></LayoutAd>}/>
+
+                {/* add */}
+                <Route path='/admin/model'  element={<LayoutAd><AddModelAd/></LayoutAd>}/>
+                <Route path='/admin/category'  element={<LayoutAd><AddCategoryAd/></LayoutAd>}/>
+
+                {/* edit */}
+                <Route path='/admin/model/:id/info'  element={<LayoutAd><EditModelAd/></LayoutAd>}/>
                 
 
                 

@@ -1,14 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react'
 // import PropTypes from 'prop-types';
-import imageAvatar from '../../assets/images/default/438x438.jpg'
+import imageAvatar from '../../../assets/images/default/438x438.jpg'
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import {useNavigate, useParams } from 'react-router-dom';
 import swal from 'sweetalert';
 import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import categoriesService from '../../service/categoriesService';
-import sizeService from '../../service/sizeService';
-import productModelService from '../../service/productModelService';
+import categoriesService from '../../../service/categoriesService';
+import sizeService from '../../../service/sizeService';
+import productModelService from '../../../service/productModelService';
+import addAvatar from '../../../utils/addAvatar';
+import addImages from '../../../utils/addImages';
 
 
 
@@ -18,10 +20,11 @@ const AddModelAd = () => {
   const [categories, setCategories] = useState(undefined);
   const [listPreview, setListPreview] = useState(null);
   const [sizes, setSizes] = useState(undefined);
+  
+  // count product in model
+  const [count, setCount] = useState(0);
 
-  const setInputImage = useCallback((e)=>{
-      
-  },[])
+
 
   const handleSubmit = useCallback((e)=>{
     e.preventDefault();
@@ -32,10 +35,10 @@ const AddModelAd = () => {
                           swal({
                             title: "Thành  công",
                             icon: "success",
-                            button: "Về trang Admin"
+                            button: "Về trang danh sách"
                             })
                         .then(( value ) =>  { 
-                          navigate("/admin")
+                          navigate("/admin/models/page/1")
                         } ) ;
                         })
                         .catch((error)=>{
@@ -67,9 +70,13 @@ const AddModelAd = () => {
         })
   },[])
 
+ 
+
   useEffect(() => {
     loadCategories();
     loadSizes();
+    addAvatar("btnAvatar-"+count, "inputAvatar-"+count, 'imgAvatar-'+count);
+    // addImages('btnImages', 'inputImages', 'divImages')
   }, []);
 
   // useEffect(() => {
@@ -131,71 +138,65 @@ const AddModelAd = () => {
               </Grid>
             </Grid>
             <Grid item xs={4}>
-              
               <Stack spacing={2} direction="row">
-                <Button variant="outlined" id="btnAvatar"> Chọn hình ảnh </Button>
+                <Button variant="outlined" id="btnImages"> Chọn hình ảnh </Button>
                   <input
-                    id="inputAvatar"
+                    id="inputImages"
                       name="images"
                       type="file"
-                      onChange={setInputImage}
+                      // hidden
                       multiple
                   />
-                    {listPreview}
+                    <div id='divImages'></div>
               </Stack>
             </Grid>
           </Grid>
         </Box>
         {/* phần insert product */}
         <Box sx={{ flexGrow: 1, marginTop:3 }}>
-          <Grid container spacing={2}>
+          <Grid container spacing={0}>
             <Grid item xs={6}>
               <Grid container spacing={2}>
-                <Grid item xs={10}>
-                  {/* <Button variant="outlined" id="btnAvatar">Chọn Avatar</Button> */}
-                  <input
-                    id="inputAvatar"
-                      name="fileAvatar"
-                      type="file"
-                      onChange={setInputImage}
-                      
-                  />
-                </Grid>
-                <Grid item xs={5}>
-                  <TextField
-                    required
-                    name="productName"
-                    label="Tên sản phẩm"
-                  />
-                </Grid>
-                <Grid item xs={5}>
-                    <FormControl fullWidth sx={{ maxWidth: 410, marginLeft: 1, marginTop:1 }}>
-                      <InputLabel id="saleType1">Cách tính giá</InputLabel>
-                      <Select
-                        fullWidth
-                        name='saleType'
-                        labelId="saleType"
-                        label="Chọn kích thước"
-                      >
-                        <MenuItem value="direct">Giảm trực tiếp</MenuItem>
-                        <MenuItem value="percent">Giảm theo phần trăm</MenuItem>
-                        <MenuItem value="add">Tăng trực tiếp</MenuItem>
-                        <MenuItem value="not">Giá gốc</MenuItem>
-                      </Select>
-                      <FormHelperText>dựa vào giá gốc, tỷ lệ giảm và Cách tính giá để tính ra giá sản phẩm </FormHelperText>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={5}>
-                    <TextField
-                      label="Giảm"
-                      type="number"
-                      name='priceSale'
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
+                <Grid item xs={3}>
+                    <input
+                      id={"inputAvatar-"+count}
+                        name="fileAvatar"
+                        type="file"
+                        hidden
                     />
+                    <img id={'imgAvatar-'+count} src={imageAvatar} alt="" width='100%' />
+                    <div className='_btnAvatar'>
+                      <Button variant="outlined"  id={"btnAvatar-"+count}>Chọn Avatar</Button>
+                    </div>
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={7}>
+                  <div className='_textFieldModelAdd'>
+                    <TextField
+                      fullWidth 
+                      required
+                      name="productName"
+                      label="Tên sản phẩm"
+                    /><br/><br/>
+                    <TextField
+                        fullWidth 
+                        label="Giảm"
+                        type="number"
+                        name='priceSale'
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      /><br/><br/>
+                      <TextField
+                        label="Số lượng"
+                        fullWidth 
+                        type="number"
+                        name='quantity'
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      /><br/>
+                  </div>
+                  
                     <FormControl fullWidth sx={{ maxWidth: 410, marginLeft: 1, marginTop:1 }}>
                       <InputLabel id="sizeID1">Chọn kích thước</InputLabel>
                       <Select
@@ -210,20 +211,24 @@ const AddModelAd = () => {
                           )):null
                         }
                       </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={5}>
-                    <TextField
-                      label="Số lượng"
-                      type="number"
-                      name='quantity'
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
+                    </FormControl><br/>
+                    <FormControl fullWidth sx={{ maxWidth: 410, marginLeft: 1, marginTop:1 }}>
+                        <InputLabel id="saleType1">Cách tính giá</InputLabel>
+                        <Select
+                          fullWidth
+                          name='saleType'
+                          labelId="saleType"
+                          label="Chọn kích thước"
+                        >
+                          <MenuItem value="direct">Giảm trực tiếp</MenuItem>
+                          <MenuItem value="percent">Giảm theo phần trăm</MenuItem>
+                          <MenuItem value="add">Tăng trực tiếp</MenuItem>
+                          <MenuItem value="not">Giá gốc</MenuItem>
+                        </Select>
+                        <FormHelperText>dựa vào giá gốc, tỷ lệ giảm và Cách tính giá để tính ra giá sản phẩm </FormHelperText>
+                      </FormControl>
                 </Grid>
               </Grid>
-
             </Grid>
           </Grid>
         </Box>

@@ -34,7 +34,7 @@ const orderService = {
           return response;
     },
     updateStatus : async (id, status) => {
-        const response = await service.put("/order/status/"+id, {
+        const response = await service.put("/order/"+id+"/status", {
             status: status
         })
           return response;

@@ -9,7 +9,6 @@ const userService = {
     },
     
     getByPage : async (page) => {
-        console.log(page, sizePage);
         return await service.get("/users",{
             params: {
               page: page,
@@ -18,15 +17,20 @@ const userService = {
           })
     },
     
-    UpdateStatus : async (id, status) => {
-        return await service.put("/user/"+id, {
+    updateStatus : async (id, status) => {
+        return await service.put("/user/"+id+"/status", {
             id : id,
             status : status
         })
     },
+    updateRoles : async (id, listRole) => {
+        return await service.put("/user/"+id+"/roles", {
+            listRole : listRole
+        })
+    },
 
     delete : async (id) => {
-        return await service.delete("/user//+id"+id)
+        return await service.delete("/user/"+id)
     },
 }
 

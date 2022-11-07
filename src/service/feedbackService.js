@@ -23,20 +23,10 @@ const feedbackService = {
     },
 
     updateStatus : async (id, status) => {
-      return await service.put("/feedback/"+id, {
+      return await service.put("/feedback/"+id+"/status", {
         params: {
           status: status
         }
-      })
-    },
-    updateInfo : async (id, name, saleType, priceSale, quantity, sizeID, modelID) => {
-      return await service.put("/feedback/"+id, {
-        name      : name,
-        saleType  : saleType, 
-        priceSale : priceSale, 
-        quantity  : quantity, 
-        sizeID    : sizeID, 
-        modelID   : modelID,
       })
     },
 

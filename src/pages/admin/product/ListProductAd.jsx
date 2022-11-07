@@ -15,27 +15,28 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import swal from 'sweetalert';
-import { Avatar, PaginationItem, Rating } from '@mui/material';
-import formatDate from '../../utils/formatDate';
-import productModelService from '../../service/productModelService';
-import formatVND from '../../utils/formatVND';
-import numberWithCommas from '../../utils/numberWithCommas';
+import { Avatar} from '@mui/material';
+import formatDate from '../../../utils/formatDate';
+import formatVND from '../../../utils/formatVND';
+import numberWithCommas from '../../../utils/numberWithCommas';
+import productService from '../../../service/productService';
 
 
 
-const ListModelAd = () => {
+const ListProductAd = () => {
     const navigate = useNavigate()
     const params = useParams();
-    const [models, setModels] = useState(undefined);
+    const [products, setProducts] = useState(undefined);
     const [currentPage, setCurrentPage] = useState(params.page);
     const [totalPage, setTotalPage] = useState(1);
 
-  const loadModels = useCallback(()=>{
-    productModelService.getAll(currentPage)
+  const loadProducts = useCallback(()=>{
+    productService.getAll(currentPage)
         .then((response)=>{
-          setModels(response.data.result)
+          console.log(response.data.result);
+          setProducts(response.data.result)
           setTotalPage(response.data.totalPage)
         })
         .catch((error)=>{
@@ -48,7 +49,7 @@ const ListModelAd = () => {
 
   useEffect(() => {
     
-    loadModels()
+    loadProducts()
   }, [currentPage]);
 
   // useEffect(() => {
@@ -58,18 +59,17 @@ const ListModelAd = () => {
 
   return (     
     <div className='_ad-lists-model'>
-      <h1>Danh sách Mẫu sản phẩm</h1>
+      <h1>Danh sách Sản phẩm</h1>
         <div className='_pagination'>
           <Stack spacing={2}>
             <Pagination  count={totalPage} color="primary" 
                 defaultValue={currentPage} 
                 onChange={(e, value)=>{
-                    setCurrentPage(value)
-                    params.page =value;
-                    navigate(`/admin/models/list/${value}`)
+                  setCurrentPage(value)
+                  params.page =value;
+                  navigate(`/admin/products/list/${value}`)
                 }
                }
-              
             />
           </Stack>
           
@@ -80,11 +80,12 @@ const ListModelAd = () => {
             <TableRow>
               <TableCell />
               <TableCell align="left">Avatar</TableCell>
-              <TableCell align="left">Tên Mẫu</TableCell>
-              <TableCell align="center">Thuộc Loại</TableCell>
-              <TableCell align="center">Gía Gốc</TableCell>
-              <TableCell align="center">Kích Thước</TableCell>
-              <TableCell align="center">Đánh Giá</TableCell>
+              <TableCell align="left">Tên sản phẩm</TableCell>
+              <TableCell align="center">Thuộc Mẫu</TableCell>
+              <TableCell align="center">Kích thước</TableCell>
+              <TableCell align="center">Tồn kho</TableCell>
+              <TableCell align="center">Đã bán</TableCell>
+              <TableCell align="center">Giá hiện tại</TableCell>
               <TableCell align="center">Trạng Thái</TableCell>
               <TableCell align="center">Ngày Tạo</TableCell>
               <TableCell align="center">Ngày cập nhật</TableCell>
@@ -92,8 +93,8 @@ const ListModelAd = () => {
           </TableHead>
           <TableBody>
             {
-              (models)?models.map((item, index)=>{
-                return <RowTableDescription model={item} key={index} />
+              (products)?products.map((item, index)=>{
+                return <RowTableDescription product={item} key={index} stt={index}/>
                 
               }):null
             }
@@ -105,39 +106,38 @@ const ListModelAd = () => {
   )
 }
 
-export default ListModelAd
+export default ListProductAd
 
 
 
 const RowTableDescription = (props) => {
     const params = useParams();
   const [open, setOpen] = useState(false);
-  const [model, setModel] = useState(props.model);
-  const [start, setStart] = useState(0);
+  const [product, setProduct] = useState(props.product);
+  // const [start, setStart] = useState(0);
 
-  const loadStart = useCallback(()=>{
-    if(model.listRating.length === 0){
-        setStart(0)
-    }else{
-        let sum = 0;
-        for (const item of model.listRating) {
-            sum +=item.rating;
-        }
+  // const loadStart = useCallback(()=>{
+  //   if(product.listRating.length === 0){
+  //       setStart(0)
+  //   }else{
+  //       let sum = 0;
+  //       for (const item of model.listRating) {
+  //           sum +=item.rating;
+  //       }
        
-        setStart(sum/model.listRating.length);
-    }
+  //       setStart(sum/model.listRating.length);
+  //   }
       
-  }, [model, params])
+  // }, [model, params])
 
   useEffect(() => {
-    loadStart()
-    setModel(props.model)
-  }, [model,  params]);
+    setProduct(props.product)
+  }, [props.product,  params]);
   
   
   return (     
     <React.Fragment>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={props.key}>
+      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={props.stt}>
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -147,21 +147,17 @@ const RowTableDescription = (props) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row" align="center"><Avatar alt="avatar" src={model.listImages[0]} /></TableCell>
-        <TableCell>{model.name}</TableCell>
-        <TableCell align="center">{model.categories.name}</TableCell>
-        <TableCell align="center">{formatVND(numberWithCommas(model.priceRoot) ) }</TableCell>
-        <TableCell align="center">
-            {
-                (model.listProduct.length===0)?"chưa có kích thước": model.listProduct.map((item, index)=>(
-                    (index === 0)?item.size.name: ', '+item.size.name
-                ))
-            }
-        </TableCell>
-        <TableCell align="center"><Rating name="Read only" value={start} readOnly /></TableCell>
-        <TableCell align="center">{(model.status)?"Bình thường":"Ngừng bán"}</TableCell>
-        <TableCell align="center">{formatDate(model.timeCreate) }</TableCell>
-        <TableCell align="center">{formatDate(model.timeUpdate)}</TableCell>
+        <TableCell component="th" scope="row" align="center"><Avatar alt="avatar" src={product.avatar} /></TableCell>
+        <TableCell>{product.name}</TableCell>
+        <TableCell align="center">{product.model.name}</TableCell>
+        <TableCell align="center">{product.size.name}</TableCell>
+        <TableCell align="center">{product.quantity}</TableCell>
+        <TableCell align="center">{product.soldProductQuantity}</TableCell>
+        <TableCell align="center">{formatVND(numberWithCommas(product.currentPrice) ) }</TableCell>
+        
+        <TableCell align="center">{(product.status)?"Bình thường":"Ngừng bán"}</TableCell>
+        <TableCell align="center">{formatDate(product.timeCreate) }</TableCell>
+        <TableCell align="center">{formatDate(product.timeUpdate)}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -179,8 +175,8 @@ const RowTableDescription = (props) => {
                 </TableHead>
                 <TableBody>
                   <TableRow>
-                    <TableCell align="center" > {model.listWishlist.length}</TableCell>
-                    <TableCell  align="center">{model.listRating.length}</TableCell>
+                    <TableCell align="center" > {'model.listWishlist.length'}</TableCell>
+                    <TableCell  align="center">{'model.listRating.length'}</TableCell>
                     
                   </TableRow>
                 </TableBody>

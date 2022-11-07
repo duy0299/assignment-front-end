@@ -7,19 +7,19 @@ const linkAdmin = '/admin/'
 const menu = [
   {
     title: "Users",
-    link: linkAdmin+"users/list/1",
+    link: linkAdmin+"users/page/1",
   },
   {
     title: "Đơn Hàng",
-    link: linkAdmin+"orders/list/1"
+    link: linkAdmin+"orders/page/1"
   },
   {
     title: "Thư phản ánh",
-    link: linkAdmin+"feedback/list/1"
+    link: linkAdmin+"feedbacks/page/1"
   },
   {
     title: "Đánh giá",
-    link: linkAdmin+"ratings/list/1"
+    link: linkAdmin+"ratings/page/1"
   },
   {
     title: "Mẫu Sản Phẩm",
@@ -27,11 +27,11 @@ const menu = [
     listChildren: [
       {
         title: "Danh Sách",
-        link: linkAdmin+"models/list/1",
+        link: linkAdmin+"models/page/1",
       },
       {
-        title: "Thêm Sản Shẩm",
-        link: linkAdmin+"model/add",
+        title: "Thêm Mẫu Sản Shẩm",
+        link: linkAdmin+"model",
       }
     ]
   },
@@ -41,27 +41,17 @@ const menu = [
     listChildren: [
       {
         title: "Danh Sách",
-        link: linkAdmin+"products/list/1",
+        link: linkAdmin+"products/page/1",
       },
       {
         title: "Thêm Sản Phẩm",
-        link: linkAdmin+"product/add",
+        link: linkAdmin+"product",
       }
     ]
   },
   {
     title: "Kích Thước",
-    link: "",
-    listChildren: [
-      {
-        title: "Danh sách",
-        link: linkAdmin+"sizes/list",
-      },
-      {
-        title: "Thêm sản phẩm",
-        link: linkAdmin+"size/add",
-      }
-    ]
+    link: linkAdmin+"sizes"
   },
   {
     title: "Thể Loại Trang Sức",
@@ -69,11 +59,11 @@ const menu = [
     listChildren: [
       {
         title: "Danh sách",
-        link: linkAdmin+"categories/list",
+        link: linkAdmin+"categories",
       },
       {
-        title: "Thêm sản phẩm",
-        link: linkAdmin+"category/add",
+        title: "Thêm loại sản phẩm",
+        link: linkAdmin+"category",
       }
     ]
   },
