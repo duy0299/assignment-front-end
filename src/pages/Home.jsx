@@ -46,12 +46,16 @@ const Home = () => {
         },
         []
     )
+    const load = useCallback(() => {
+            loadMostPopularProducts();
+            loadNewProduct();
+        },[])
+
 
 
     
     useEffect(() => {
-        loadMostPopularProducts();
-        loadNewProduct();
+        load()
     }, []);  
  
     
@@ -66,31 +70,6 @@ const Home = () => {
                 auto={true}
                 timeOut={3000}
                />
-            
-            {/* list Best selling section */}
-            {/* <Section>
-                <SectionTitle>
-                    Top sản phẩm bán chạy trong tuần
-                </SectionTitle>
-                <SectionBody>
-                    <Grid 
-                        col={5}
-                        mdCol={2}
-                        smCol={1}
-                        gap={20}
-                    >
-                        
-                        {
-                           (listNewModel)? listNewModel.map((item, index)=>(
-                                <ProductCard
-                                    product={item}
-                                    key={index}
-                                />
-                            )):null
-                        }
-                    </Grid>
-                </SectionBody>
-            </Section> */}
 
             <Section>
                 <SectionTitle>
@@ -108,6 +87,7 @@ const Home = () => {
                             <ProductCard
                                 product={item}
                                 key={index}
+                                reLoad={load}
                             />
                         )):null
                     }
@@ -141,6 +121,7 @@ const Home = () => {
                                 <ProductCard
                                     product={item}
                                     key={index}
+                                    reLoad={load}
                                 />
                             )):null
                         }

@@ -1,3 +1,4 @@
+import cookies from '../utils/cookies';
 import service from './setingAPI';
 
 const sizeService = {
@@ -28,7 +29,12 @@ const sizeService = {
 
 
     delete : async (id) => {
-        return await service.get("/size/"+id)
+        return await service.get("/size/"+id, 
+        {
+          headers: {
+            "Authorization": `Bearer ${(cookies.getUser()!==null)?cookies.getUser().token:""}`
+          }
+        })
       },
     
 }

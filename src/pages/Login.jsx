@@ -127,12 +127,7 @@ const SubmitButton = props => (
 
 const OtherMethods = props => (
   <div id="alternativeLogin">
-    <label>Đăng nhập với:</label>
-    <div id="iconGroup">
-      <Facebook />
-      <Twitter />
-      <Google />
-    </div>
+    
     <div classNameName="text-register-in-login">
         <Link to='/register'>Đăng ký tài khoản?</Link>
     </div>

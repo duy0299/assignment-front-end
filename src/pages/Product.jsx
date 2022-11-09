@@ -13,7 +13,7 @@ import swal from 'sweetalert'
 
 
 
-const Product = props => {
+const Product = (props) => {
     const [productModel, setProductModel] = useState(undefined);
     const [mostPopularProducts, setMostPopularProducts] = useState(undefined);
    
@@ -40,8 +40,7 @@ const Product = props => {
         },
         [params.id]
     )
-    const loadMostPopularProducts = useCallback(
-        () => {
+    const loadMostPopularProducts = useCallback(() => {
             productModelService.getMostPopularProduct()
             .then(function (response) {
                 setMostPopularProducts(response.data.result)
@@ -62,21 +61,15 @@ const Product = props => {
         [productModel]
     )
     const loadAfterRating = () => {
-            loadProductModel();
-            loadMostPopularProducts();
-        }
-
-
-    useEffect(() => {
         loadProductModel();
         loadMostPopularProducts();
-    }, []);    
+    }
 
     useEffect(() => {
         window.scrollTo(0,0)
         loadMostPopularProducts();
         loadProductModel()
-    }, [loadProductModel])
+    }, [params.id])
 
 
 
@@ -87,7 +80,7 @@ const Product = props => {
         <Helmet title= {(productModel !== undefined)?productModel.name:'không tìm thấy sản phẩm'}>
             <Section>
                 <SectionBody>
-                    {(productModel !== undefined)?<ProductView productModel={productModel}/>:<h3>Không tìm thấy sản phẩm</h3>}
+                    {(productModel !== undefined)?<ProductView productModel={productModel} reLoadModel={loadProductModel}/>:<h3>Không tìm thấy sản phẩm</h3>}
                 </SectionBody>
             </Section>
             <Section>
@@ -101,7 +94,7 @@ const Product = props => {
                 </SectionTitle>
                 <SectionBody>
                     <Grid
-                        col={8}
+                        col={5}
                         mdCol={2}
                         smCol={1}
                         gap={20}
@@ -111,6 +104,7 @@ const Product = props => {
                                 <ProductCard
                                     product={item}
                                     key={index}
+                                    reLoad={loadMostPopularProducts}
                                 />
                             )):null
                         }

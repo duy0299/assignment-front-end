@@ -19,10 +19,10 @@ const validate = {
             return false;
         }
 
-        const patt = /^[0-9]{9,13}$/;
-    
-        if (patt.test(phoneNumber)) {
-            swal('Chú Ý','Số điện thoại không hợp lệ','warning');
+       
+        var vnf_regex = /((09|03|07|08|05)+([0-9]{8})\b)/g;
+        if (vnf_regex.test(phoneNumber) == false) {
+            swal('Chú Ý','Số điện thoại không hợp lệ','warning');;
             return false;
         }
         

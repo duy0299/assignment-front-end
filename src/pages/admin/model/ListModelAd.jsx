@@ -12,18 +12,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Paper from '@mui/material/Paper';
-import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Rating, SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
-import ShareIcon from '@mui/icons-material/Share';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Rating, SpeedDial, SpeedDialAction } from '@mui/material';
 import {useNavigate, useParams } from 'react-router-dom';
 import swal from 'sweetalert';
 import formatDate from '../../../utils/formatDate';
 import productModelService from '../../../service/productModelService';
 import formatVND from '../../../utils/formatVND';
 import numberWithCommas from '../../../utils/numberWithCommas';
+import swalErrorAPI from '../../../utils/swalErrorAPI';
 
 const actions = [
   { 
@@ -34,17 +31,17 @@ const actions = [
   { 
     icon: <i className='bx bx-info-circle _bxs-base'></i>, 
     name: 'Thông tin', 
-    link:"/admin/model/edit/info" 
+    link:"info" 
   },
   { 
-    icon: <DeleteIcon />, 
+    icon: <i className='bx bx-trash _bxs-base'/>, 
     name: 'Xóa', 
-    link:"" 
+    link:"delete" 
   },
   { 
     icon: <i className='bx bx-image-alt _bxs-base'></i>, 
     name: 'hình ảnh', 
-    link:"/admin/model/edit/images" 
+    link:"images" 
   },
 ]
 
@@ -56,18 +53,16 @@ const ListModelAd = () => {
   const [totalPage, setTotalPage] = useState(1);
 
   const loadModels = useCallback(()=>{
-    productModelService.getAll(currentPage)
+    productModelService.getByPage(currentPage)
         .then((response)=>{
           setModels(response.data.result)
           setTotalPage(response.data.totalPage)
         })
         .catch((error)=>{
           console.log(error);
-            
+          swalErrorAPI(error);
         })
   },[currentPage])
-
-
 
   useEffect(() => {
     
@@ -89,10 +84,9 @@ const ListModelAd = () => {
                 onChange={(e, value)=>{
                     setCurrentPage(value)
                     params.page =value;
-                    navigate(`/admin/models/list/${value}`)
+                    navigate(`/admin/models/page/${value}`)
                 }
                }
-              
             />
           </Stack>
           
@@ -139,7 +133,6 @@ const RowTableDescription = (props) => {
   const [open, setOpen] = useState(false);
   const model = props.model
   const [start, setStart] = useState(0);
-  const [statusChange, setStatusChange] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
 
   const loadStart = useCallback(()=>{
@@ -156,19 +149,18 @@ const RowTableDescription = (props) => {
       
   }, [model, params])
 
-  const handleChangeStatus = () => {
+  const handleSubmitStatus = () => {
     let radio = document.getElementsByName('status')
     for(let i in radio){
       if(radio[i].checked === true){
         productModelService.updateStatus(model.id, radio[i].value)
         .then((response)=>{
           props.reLoad()
-          swal("Đã Trạng thái thành công", "", "success");
-          props.reLoad()
+          swal("Đã cập nhật Trạng thái thành công", "", "success");
         })
         .catch((error)=>{
           console.log(error);
-          swal("Lỗi", "", "error");
+          swalErrorAPI(error)
         })
       }
     }
@@ -191,7 +183,7 @@ const RowTableDescription = (props) => {
             size="small"
             onClick={() => setOpen(!open)}
           >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            {open ? <i className='bx bx-chevron-up _iconBase' />: <i className='bx bx-chevron-down _iconBase'/>}
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row" align="center"><Avatar alt="avatar" src={model.listImages[0]} /></TableCell>
@@ -206,7 +198,7 @@ const RowTableDescription = (props) => {
             }
         </TableCell>
         <TableCell align="center"><Rating name="Read only" value={start} readOnly /></TableCell>
-        <TableCell align="center">{(model.status)?"Bình thường":"Ngừng bán"}</TableCell>
+        <TableCell align="center"  ><p className={(model.status)?'':'_status-0'}>{(model.status)?"Bình thường":"Ngừng bán"}</p></TableCell>
         <TableCell align="center">{formatDate(model.timeCreate) }</TableCell>
         <TableCell align="center">{formatDate(model.timeUpdate)}</TableCell>
         <TableCell align='center'>
@@ -224,8 +216,8 @@ const RowTableDescription = (props) => {
                       icon={action.icon}
                       tooltipTitle={action.name}
                       onClick={(e)=>{
-                        switch (action.name.trim()) {
-                          case "":{
+                        switch (action.link.trim()) {
+                          case "delete":{
                             swal({
                               title: "Chú ý",
                               text: "Bạn có chắc chắn muốn xóa không",
@@ -257,11 +249,11 @@ const RowTableDescription = (props) => {
                             setOpenDialog(true);
                             break;
                           }
-                          case "thông tin":{
+                          case "info":{
                             navigate("/admin/model/"+model.id+"/info");
                             break;
                           }
-                          case 'hình ảnh':{
+                          case 'images':{
                             navigate("/admin/model/"+model.id+"/images");
                             break;
                           }
@@ -331,7 +323,7 @@ const RowTableDescription = (props) => {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Quay lại</Button>
-              <Button onClick={handleChangeStatus} >Xác nhận</Button>
+              <Button onClick={handleSubmitStatus} >Xác nhận</Button>
             </DialogActions>
           </Dialog>
     </React.Fragment>

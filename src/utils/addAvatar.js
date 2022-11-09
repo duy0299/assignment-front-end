@@ -7,19 +7,21 @@ const addAvatar =  (button, input, img) =>{
     const avatarImg = document.getElementById(img);
   
       avatarButton.addEventListener('click', function (e) {
+        console.log('avatar Button ');
         avatarImg.src = imageAvatar;
         avatarInput.click();
   
       });
 
-      avatarImg.addEventListener('click', function (e) {
-        avatarImg.src = imageAvatar;
-        avatarInput.click();
+      // avatarImg.addEventListener('click', function (e) {
+      //   console.log('avatar Img ');
+      //   avatarImg.src = imageAvatar;
+      //   avatarInput.click();
     
-      });
+      // });
   
       avatarInput.addEventListener('change', function (e) {
-       
+        console.log('avatar Input ');
         if (e.target.files.length) {
           avatarImg.src = URL.createObjectURL(e.target.files[0]);
         }

@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from 'react-router-dom'
 const linkAdmin = '/admin/'
 
@@ -114,7 +113,7 @@ const TabMenuLeft = (props) => {
                   <Accordion>
                       {/* parent */}
                       <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
+                          expandIcon={<i className='bx bx-chevron-down _iconBase'/>}
                           aria-controls="panel1a-content"
                           id="panel1a-header"
                       >

@@ -1,4 +1,5 @@
-import service, {sizePage} from './setingAPI';
+import cookies from '../utils/cookies';
+import service, {serviceImage, sizePage} from './setingAPI';
 
 const productService = {
   
@@ -7,6 +8,11 @@ const productService = {
           params: {
             page: page,
             size: sizePage
+          }
+        }, 
+        {
+          headers: {
+            "Authorization": `Bearer ${(cookies.getUser()!==null)?cookies.getUser().token:""}`
           }
         })
       return response;
@@ -17,7 +23,7 @@ const productService = {
     },
 
     insert : async (formData) => {
-      return await service.post("/product",formData)
+      return await serviceImage.post("/product",formData)
     },
 
     updateStatus : async (id, status) => {

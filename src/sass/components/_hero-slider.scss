@@ -121,7 +121,7 @@
             }
 
             img {
-                height: 50vh;
+                height: 40vh;
                 position: absolute;
                 bottom: 0;
                 right: 0;
@@ -141,7 +141,7 @@
                 width: $size;
                 position: absolute;
                 right: 0;
-                top: 50%;
+                top: 60%;
                 border-radius: 58% 42% 38% 62% / 42% 55% 45% 58%;
                 transform: translate(0, -50%);
                 transition: border-radius 13s ease;

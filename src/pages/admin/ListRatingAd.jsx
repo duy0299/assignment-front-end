@@ -13,14 +13,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import swal from 'sweetalert';
-import { Avatar, PaginationItem, Rating } from '@mui/material';
+import {  useNavigate, useParams } from 'react-router-dom';
+
+import { Rating } from '@mui/material';
 import formatDate from '../../utils/formatDate';
-import formatVND from '../../utils/formatVND';
-import numberWithCommas from '../../utils/numberWithCommas';
 import ratingService from '../../service/ratingService';
 
 
@@ -64,7 +60,7 @@ const ListRatingAd = () => {
                 onChange={(e, value)=>{
                   setCurrentPage(value)
                   params.page =value;
-                  navigate(`/admin/ratings/list/${value}`)
+                  navigate(`/admin/ratings/page/${value}`)
                 }
                }
               
@@ -106,16 +102,15 @@ export default ListRatingAd
 
 
 const RowTableDescription = (props) => {
-  console.log(props.rating);
+  
   const params = useParams();
   const [open, setOpen] = useState(false);
   const rating = props.rating
-  const [total, setTotal] = useState(0);
   const [status, setStatus] = useState("");
 
 
 
-  const loadStatus = useCallback(()=>{
+  const loadStatus = ()=>{
     switch (rating.status) {
       case 0:{
           setStatus("Đã xóa")
@@ -133,11 +128,11 @@ const RowTableDescription = (props) => {
       default:
         break;
     }
-  }, [rating, params])
+  }
 
   useEffect(() => {
     loadStatus()
-  }, [rating,  params]);
+  }, [props,  params]);
   
   
   return (     
@@ -149,7 +144,7 @@ const RowTableDescription = (props) => {
             size="small"
             onClick={() => setOpen(!open)}
           >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            {open ? <i className='bx bx-chevron-up _iconBase' />: <i className='bx bx-chevron-down _iconBase'/>}
           </IconButton>
         </TableCell>
         <TableCell>{rating.userInfo.firstName + " " + rating.userInfo.lastName}</TableCell>

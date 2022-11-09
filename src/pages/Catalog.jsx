@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionDetails, AccordionSummary, Pagination, Stack, Typography } from '@mui/material';
 import swal from 'sweetalert'
 
 import Helmet from '../components/Helmet'
@@ -17,40 +16,32 @@ import categoriesService from '../service/categoriesService'
 import sizeService from '../service/sizeService'
 
 const Catalog = () => {
-    const  history = useLocation();
-    const navigate = useNavigate();
     const initFilter = {
         size: []
     }
+    const  history = useLocation();
+    const navigate = useNavigate();
     const counterPageRef = useRef(null)
     const params = useParams();
+
+    const [currentPage, setCurrentPage] = useState(params.page);
     const [products, setProducts] = useState(undefined)
     const [categories, setCategories] = useState(undefined)
     const [sizes, setSizes] = useState(undefined)
     const [filter, setFilter] = useState(initFilter)
     const [totalPage, setTotalPage] = useState(1)
-    const [arrTotalPage, setArrTotalPage] = useState(new Array(1))
 
     
 
     const loadListProduct = useCallback(
         () => {
             if(!Number.isNaN(params.page)){
-                if(params.id === undefined){
+                if(params.id === undefined && params.name === undefined ){
                     productModelService.getAllBySatatus(params.page)
                     .then(function (response) {
                         console.log(response.data);
                         setProducts(response.data.result)
                         setTotalPage(response.data.totalPage)
-                        setArrTotalPage((e)=>{
-                            e = new Array();
-                            console.log(response.data);
-                            for (let i = 1; i < response.data.totalPage+1; i++) {
-                                e.push(i)
-                            }
-                            return e;
-                        })
-                        
                     })
                     .catch(function (error) {
                         if(error.response){
@@ -64,19 +55,30 @@ const Catalog = () => {
                         }
                         return null
                     });
-                }else{
-                    productModelService.getByCategories(params.id,params.page)
+                }else if(params.id !== undefined){
+                    productModelService.getByCategories(params.id, params.page)
                     .then(function (response) {
                         setProducts(response.data.result)
                         setTotalPage(response.data.totalPage)
-                        setArrTotalPage((e)=>{
-                            e = [];
-                            for (let i = 1; i < response.data.totalPage+1; i++) {
-                                e.push(i)
+                    })
+                    .catch(function (error) {
+                        if(error.response){
+                            if(error.response.data.message == null){
+                                swal("Lỗi", error.response.data.result, "error");
+                            }else{
+                                swal("Lỗi", error.response.data.message, "error");
                             }
-                            return e;
-                        })
-                        
+                        }else{
+                            swal("Lỗi", error.message, "error");
+                        }
+                        return null
+                    });
+                }else if(params.name !== undefined){
+                    console.log(params.name);
+                    productModelService.search(params.name, params.page)
+                    .then(function (response) {
+                        setProducts(response.data.result)
+                        setTotalPage(response.data.totalPage)
                     })
                     .catch(function (error) {
                         if(error.response){
@@ -91,7 +93,6 @@ const Catalog = () => {
                         return null
                     });
                 }
-                
             }
         },
         [params]
@@ -147,7 +148,6 @@ const Catalog = () => {
         },
         []
     )
-
     const filterSelect = (type, checked, item) => {
         // if (checked) {
         //     switch(type) {
@@ -173,7 +173,6 @@ const Catalog = () => {
         //     }
         // }
     }
-
     const clearFilter = () => setFilter(initFilter)
 
     const updateProducts = useCallback(
@@ -193,45 +192,6 @@ const Catalog = () => {
             setProducts(temp)
         },
         [filter, products],
-    )
-    // const changePageCounter = useCallback(
-    //     ,
-    //     [],
-    // )
-    const nextPageCounter = useCallback(
-        (e) => {
-            console.log({historyPathname:history.pathname, totalPage, paramsPage:params.page});
-            let url = history.pathname;
-            let paramPage = Number.parseInt(params.page) +1
-            url = url.replace("/"+params.page, "/"+paramPage)
-            if(Number.parseInt(totalPage) <= Number.parseInt(params.page)){
-                swal("Chú ý", "bạn đang ở trang cuối", "warning");
-                return 0;
-            }
-            history.pathname = url
-            params.page = paramPage;
-            console.log({historyPathname:history.pathname, totalPage, paramsPage:params.page});
-            navigate(url);
-        },
-        [],
-    )
-    const prePageCounter = useCallback(
-        (e) => {
-            console.log({historyPathname:history.pathname, totalPage, paramsPage:params.page});
-            let url = history.pathname;
-            let paramPage = Number.parseInt(params.page) -1
-            url = url.replace("/"+params.page, "/"+paramPage)
-            
-            if(1 === Number.parseInt(params.page)){
-                swal("Chú ý", "bạn đang ở trang đầu", "warning");
-                return null;
-            }
-            history.pathname = url
-            params.page = paramPage;
-            console.log({historyPathname:history.pathname, totalPage, paramsPage:params.page});
-            navigate(url);
-        },
-        [],
     )
 
     const toggleTab = useCallback(
@@ -261,7 +221,6 @@ const Catalog = () => {
     const filterRef = useRef(null)
 
     const showHideFilter = () => filterRef.current.classList.toggle('active')
-    
 
     if(Number.isNaN(params.page)){
         return null;
@@ -289,7 +248,7 @@ const Catalog = () => {
                                                             aria-controls="panel1a-content"
                                                             id="panel1a-header"
                                                         >
-                                                            <Link to={`/catalog/category/${item.id}/1`}>
+                                                            <Link to={`/catalog/category/${item.id}/page/1`}>
                                                                 <Typography >
                                                                     <span onClick={toggleTab} className='_titleCategories'>{item.name}</span> 
                                                                 </Typography>
@@ -302,11 +261,11 @@ const Catalog = () => {
                                                     <Accordion>
                                                         {/* parent */}
                                                         <AccordionSummary
-                                                            expandIcon={<ExpandMoreIcon />}
+                                                            expandIcon={<i className='bx bx-chevron-down _iconBase'/>}
                                                             aria-controls="panel1a-content"
                                                             id="panel1a-header"
                                                         >
-                                                        <Link to={`/catalog/category/${item.id}/1`}>
+                                                        <Link to={`/catalog/category/${item.id}/page/1`}>
                                                                 <Typography >
                                                                     <span onClick={toggleTab} className='_titleCategories'>{item.name}</span> 
                                                                 </Typography>
@@ -316,7 +275,7 @@ const Catalog = () => {
                                                         {
                                                             item.listChildren.map((item, index)=>(
                                                                 <AccordionDetails>
-                                                                    <Link to={`/catalog/category/${item.id}/1`}>
+                                                                    <Link to={`/catalog/category/${item.id}/page/1`}>
                                                                         <Typography >
                                                                             <span onClick={toggleTab} className='_titleCategories'>{item.name}</span> 
                                                                         </Typography>
@@ -363,9 +322,6 @@ const Catalog = () => {
                     <Button size="sm" onClick={() => showHideFilter()}>bộ lọc</Button>
                 </div>
                 <div className="catalog__content">
-                    {/* <InfinityList
-                        data={products}
-                    /> */}
                     {
                         (products)?
                         <Grid 
@@ -375,59 +331,42 @@ const Catalog = () => {
                             gap={20}
                         >
                             {
-                                (products.length!==0)?  
-                                    products.map((item, index)=>(
-                                        <ProductCard
-                                            product={item}
-                                            key={index}
-                                        />
-                                    ))
-                                    :
-                                    <div className='text-list-empty'>
-                                        <p>Hiện Tại Chưa Có Sản Phẩm</p>
-                                    </div>
+                                (
+                                    products.length!==0)?  
+                                        products.map((item, index)=>(
+                                            <ProductCard
+                                                product={item}
+                                                key={index}
+                                                reLoad={loadListProduct}
+                                            />
+                                ))
+                                :
+                                <div className='text-list-empty'>
+                                    <p>Hiện Tại Chưa Có Sản Phẩm</p>
+                                </div>
                             }
                         </Grid>
                         :null
-
                     }
-                     
-                    
                     <div className='_pageCounter' ref={counterPageRef}>
-                        <a href="javascript:void(0)">
-                            <div className='_pageCounter__pre' name="pre" onClick={prePageCounter} >
-                                
-                                <i className='bx bx-chevron-left' ></i>
-                            </div>
-                        </a>
-                        {
-                            (arrTotalPage !== null)?arrTotalPage.map((item, index)=>(
-                                <a href="javascript:void(0)">
-                                    <div className={`_pageCounter__${(item==params.page)?"active-page":"page"}`}  
-                                        onClick={
-                                            (e) => {
-                                                
-                                                let url = history.pathname;
-                                                console.log(history.pathname);
-                                                console.log(params.page);
-                                                console.log(item);
-                                                url = url.replace("/"+params.page, "/"+item)
-                                                history.pathname = url
-                                                params.page = item;
-                                                navigate(url);
-                                        }}
-                                    >
-                                        <p>{item}</p>
-                                    </div>
-                                </a>
-                                
-                            )): null
-                        }
-                        <a href="javascript:void(0)">
-                            <div className='_pageCounter__next' name="next" onClick={nextPageCounter}>
-                                <i className='bx bx-chevron-right'></i>
-                            </div>
-                        </a>
+                        <Stack spacing={2}>
+                            <Pagination  count={totalPage} color="primary" 
+                                defaultValue={currentPage} 
+                                onChange={(e, value)=>{
+                                    let url = history.pathname;
+                                    url = url.replace("page/"+params.page, "page/"+value)
+                                    
+                                    history.pathname = url
+                                    params.page = value;
+                                    setCurrentPage(value)
+                                    console.log(url);
+                                    navigate(url);
+                                }
+                            }
+                            />
+                        </Stack>
+
+                        
                     </div>
                 </div>
             </div>

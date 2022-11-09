@@ -1,9 +1,13 @@
+import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
 import React, { useRef, useEffect, useCallback, useState } from 'react'
-import { Link, useLocation, useResolvedPath } from 'react-router-dom'
+import { createContext } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import swal from 'sweetalert'
 
 import logo from '../assets/images/Logo-2.png'
+import userService from '../service/userService'
 import cartSession from '../utils/cartSession'
+import changeToSlug from '../utils/changeToSlug'
 import cookies from '../utils/cookies'
 import Button from './Button'
 
@@ -14,7 +18,7 @@ const mainNav = [
     },
     {
         display: "Sản phẩm",
-        path: "/catalog/1"
+        path: "/catalog/page/1"
     },
     {
         display: "Liên hệ",
@@ -28,19 +32,35 @@ const mainNav = [
 
 
 const Header = (props) => {
-// useLocation() để lấy path name phía sau host
+    
     const {pathname} = useLocation();
-    const [quantityInCart, setQuantityInCart] = useState((cartSession.getCart())?cartSession.getCart().length:0)
+    const navigate = useNavigate();
     const activeNav = mainNav.findIndex(e=> e.path === pathname)
     const headerRef = useRef(null)
     const menuLeft = useRef(null);
-    const user = cookies.getUser();
-    
+    const [user, setUser] = useState(undefined);
+
+    const [anchorElUser, setAnchorElUser] = useState(null);
+
+    const LoadUser = useCallback(()=>{
+        userService.getWithToken()
+        .then((response)=>{
+            console.log(response.data.result);
+            setUser(response.data.result);
+        })
+        .catch((error)=>{
+            console.log(error);
+        })
+    },[])
+    const handleCloseUserMenu = () => {
+        setAnchorElUser(null);
+    };
+    const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
     const menuToggle = () => {
-        console.log(menuLeft);
         return menuLeft.current.classList.toggle('active')
     }
-    
     const scrollhandler = useCallback(() => {
         if(headerRef.current !== null && headerRef.current !== undefined){
             if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
@@ -51,57 +71,46 @@ const Header = (props) => {
             }
         }
     })
-
+    const handleLogout = ()=>{
+        cookies.deleteUser();
+        setAnchorElUser(null);
+        navigate("/login")
+    }
+    const handleNavigateMyAccount = (e)=>{
+        setAnchorElUser(null);
+        navigate("/my-account")
+    }
     const clickSearch = useCallback(() => {
         swal({
             text: 'Nhập vào tên sản phẩm bạn muốn tìm',
             content: "input",
             button: {
               text: "Tìm kiếm!",
-              closeModal: false,
+              closeModal: true,
             },
           })
           .then(name => {
             if (!name) throw null;
-           
-            return fetch(`https://itunes.apple.com/search?term=${name}&entity=movie`);
+            navigate(`/catalog/search/${changeToSlug(name)}/page/1`)
+            swal.stopLoading();
+            swal.close();
           })
-          .then(results => {
-            return results.json();
-          })
-          .then(json => {
-            const movie = json.results[0];
-           
-            if (!movie) {
-              return swal("No movie was found!");
-            }
-           
-            const name = movie.trackName;
-            const imageURL = movie.artworkUrl100;
-           
-            swal({
-              title: "Top result:",
-              text: name,
-              icon: imageURL,
-            });
-          })
-          .catch(err => {
-            if (err) {
-              swal("Oh noes!", "The AJAX request failed!", "error");
-            } else {
-              swal.stopLoading();
-              swal.close();
-            }
-          });
+          
     })
 // hàm dùng khi cuộn màn hình xuống
     useEffect(() => {
         window.addEventListener("scroll", scrollhandler)
         return () => {
-            setQuantityInCart((cartSession.getCart())?cartSession.getCart().length:0)
             window.removeEventListener('scroll', scrollhandler)
         };
     }, []);
+    useEffect(() => {
+        LoadUser()
+        
+    }, []);
+    useEffect(() => {
+    }, [props]);
+    
     
 
     return (
@@ -142,22 +151,52 @@ const Header = (props) => {
                             <Link to="/cart">
                                 <i className="bx bx-shopping-bag"></i>
                                 <div className='_quantityProductCart'>
-                                    <span>{quantityInCart}</span>
+                                    <span>{props.quantityInCart}</span>
                                 </div>
                             </Link>
                         </div>
                         {
-                            (user === null)
+                            (user)
                             ?
+                            <Box>
+                                <Tooltip title="Open settings">
+                                    <IconButton onClick={handleOpenUserMenu}  sx={{ 0: 0 }}>
+                                        <Avatar alt="Remy Sharp" src={(user)?user.avatar:logo} />
+                                    </IconButton>
+                                </Tooltip>
+                                <Menu
+                                    sx={{ mt: '45px' }}
+                                    id="menu-appbar"
+                                    anchorEl={anchorElUser}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={Boolean(anchorElUser)}
+                                    onClose={handleCloseUserMenu}
+                                >
+                                    <MenuItem key={1} onClick={handleNavigateMyAccount}>
+                                        <Typography textAlign="center">Trang Cá nhân</Typography>
+                                    </MenuItem>
+                                    <MenuItem key={2} onClick={handleCloseUserMenu}>
+                                        <Typography textAlign="center">Cài đặt</Typography>
+                                    </MenuItem>
+                                    <MenuItem key={3} onClick={handleLogout}>
+                                        <Typography textAlign="center">Đăng xuất</Typography>
+                                    </MenuItem>
+                                </Menu>
+                            </Box>:
                             <div className="header__menu__item header__menu__right__item">
                                 <Link to="/login">
                                     <Button>Đăng nhập</Button>
                                 </Link>
                             </div>
-                            :
-                            <div className="header__menu__item header__menu__right__item">
-                                <Link><i className="bx bx-user"></i></Link>
-                            </div>
+                        
                         }
                         
                         

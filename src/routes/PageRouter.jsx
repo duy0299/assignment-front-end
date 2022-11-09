@@ -11,6 +11,7 @@ import Login from '../pages/Login'
 import Register from '../pages/Register'
 import Wishlist from '../pages/Wishlist'
 import Checkout from '../pages/Checkout'
+import MyAccount from '../pages/MyAccount'
 import LayoutAd from '../pages/admin/LayoutAd'
 import ListUserAd from '../pages/admin/ListUserAd'
 import ListModelAd from '../pages/admin/model/ListModelAd'
@@ -23,6 +24,7 @@ import ListFeedbackAd from '../pages/admin/ListFeedbackAd'
 import AddModelAd from '../pages/admin/model/AddModelAd'
 import EditModelAd from '../pages/admin/model/EditModelAd'
 import AddCategoryAd from '../pages/admin/categories/AddCategoryAd'
+import AddProductsAd from '../pages/admin/product/AddProductsAd'
 
 const HomePage = <Layout><Home/></Layout>;
 const ProductPage = <Layout><Product/></Layout>;
@@ -31,6 +33,7 @@ const CatalogPage = <Layout><Catalog/></Layout>;
 const WishlistPage = <Layout><Wishlist/></Layout>;
 const CartPage = <Layout><Cart/></Layout>;
 const CheckoutPage = <Layout><Checkout/></Layout>;
+const MyAccountPage = <Layout><MyAccount/></Layout>;
 
 const PageRouter = () => {
     
@@ -46,8 +49,10 @@ const PageRouter = () => {
                 <Route path='/product/:id' element={ProductPage}/>
                 <Route path='/cart' element={CartPage}/>
                 <Route path='/wishlist' element={WishlistPage}/>
-                <Route path='/catalog/:page' element={CatalogPage}/>
-                <Route path='/catalog/category/:id/:page' element={CatalogPage}/>
+                <Route path='/my-account' element={MyAccountPage}/>
+                <Route path='/catalog/page/:page' element={CatalogPage}/>
+                <Route path='/catalog/search/:name/page/:page' element={CatalogPage}/>
+                <Route path='/catalog/category/:id/page/:page' element={CatalogPage}/>
 
 
                 <Route path='/admin/' element={<LayoutAd/>} ></Route>
@@ -64,6 +69,7 @@ const PageRouter = () => {
                 {/* add */}
                 <Route path='/admin/model'  element={<LayoutAd><AddModelAd/></LayoutAd>}/>
                 <Route path='/admin/category'  element={<LayoutAd><AddCategoryAd/></LayoutAd>}/>
+                <Route path='/admin/product'  element={<LayoutAd><AddProductsAd/></LayoutAd>}/>
 
                 {/* edit */}
                 <Route path='/admin/model/:id/info'  element={<LayoutAd><EditModelAd/></LayoutAd>}/>

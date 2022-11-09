@@ -20,7 +20,7 @@ const cookies = {
         return null;
     },
     deleteUser(){
-        document.cookie = userKey+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+        document.cookie = userKey+"= ; expires=Thu, expires=Thu, 18 Dec 2018 12:00:00 UTC; path=/";
         return true;
     }
 

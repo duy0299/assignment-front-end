@@ -11,10 +11,9 @@ import wishlistService from "../service/wishlistService";
 
 import cookies from '../utils/cookies';
 import { useEffect } from 'react';
-const user = (cookies.getUser()!==null)?cookies.getUser():"";
 
-const ProductCard = props => {
-    // console.log(props.product);
+const ProductCard = (props) => {
+    
     const wishlistRef = useRef(null); 
     const id        = props.product.id       
     const img01     = props.product.listImages[0]
@@ -24,20 +23,12 @@ const ProductCard = props => {
     const priceFrom = props.product.priceFrom
     const priceRoot = props.product.priceRoot
     const [idWishlist, setIdWishlist] = useState(undefined);
-    const email = user.name
-
-    useEffect(()=>{
-        for (const item of props.product.listWishlist ) {
-            if (item.email === email) {
-                setIdWishlist(item.id)
-            }
-        }
-    },[])
     
-    const addWishlist = useCallback((e)=>{
+    
+    const addWishlist = (e)=>{
         wishlistService.insert(id)
                 .then(function (response) {
-                    console.log(response.data);
+                    props.reLoad();
                     swal (
                             {
                             title: "Thành  công",
@@ -54,17 +45,12 @@ const ProductCard = props => {
                     
                     console.log(error);
                 })
-    })
-    const removeWishlist = useCallback((e)=>{
+    }
+    const removeWishlist = (e)=>{
         wishlistService.delete(idWishlist)
                 .then(function (response) {
-                    console.log(response.data);
-                    swal (
-                            {
-                            title: "Thành  công",
-                            icon: "success"
-                        }
-                    )
+                    props.reLoad();
+                    setIdWishlist(true)
                 })
                 .catch(function (error) {
                     if(error.response.data.message == null){
@@ -74,8 +60,7 @@ const ProductCard = props => {
                     }
                     console.log(error);
                 })
-    })
-    
+    }
     let ComponentPrice = (props) =>{
         if(props.priceFrom ===  props.priceTo){
             return (
@@ -98,7 +83,21 @@ const ProductCard = props => {
 
         }
     }
-    
+
+    useEffect(()=>{
+        const user = (cookies.getUser()!==null)?cookies.getUser():"";
+        const email = user.name
+        let flat = true;
+        for (const item of props.product.listWishlist ) {
+            if (item.email === email) {
+                setIdWishlist(item.id)
+                flat = false;
+            }
+        }
+        if(flat){
+            setIdWishlist(undefined)
+        }
+    },[props])
 
     return (
         <div className="product-card" ref={wishlistRef}>
@@ -131,7 +130,7 @@ const ProductCard = props => {
                 </div>
             
             <div className="product-card__btn">
-                <Link to={`/cart`}>
+                <Link to={`/product/${id}`}>
                     <Button
                         size="sm"    
                         icon="bx bx-cart"

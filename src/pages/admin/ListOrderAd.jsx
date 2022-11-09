@@ -13,16 +13,26 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useNavigate, useParams } from 'react-router-dom';
 import swal from 'sweetalert';
 import formatDate from '../../utils/formatDate';
 import formatVND from '../../utils/formatVND';
 import numberWithCommas from '../../utils/numberWithCommas';
 import orderService from '../../service/orderService';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, SpeedDial, SpeedDialAction } from '@mui/material';
 
-
+const actions = [
+  { 
+    icon: <i className='bx bx-station _bxs-base'></i>, 
+    name: 'Trạng thái', 
+    link:"status" 
+  },
+  { 
+    icon: <i className='bx bx-trash _bxs-base'/>, 
+    name: 'Xóa', 
+    link:"delete" 
+  },
+]
 
 const ListOrderAd = () => {
     const navigate = useNavigate()
@@ -31,7 +41,7 @@ const ListOrderAd = () => {
     const [currentPage, setCurrentPage] = useState(params.page);
     const [totalPage, setTotalPage] = useState(1);
 
-  const loadModels = useCallback(()=>{
+  const loadOrders = useCallback(()=>{
     orderService.getAll(currentPage)
         .then((response)=>{
           setOrders(response.data.result)
@@ -47,7 +57,7 @@ const ListOrderAd = () => {
 
   useEffect(() => {
     
-    loadModels()
+    loadOrders()
   }, [currentPage]);
 
 
@@ -62,7 +72,7 @@ const ListOrderAd = () => {
                 onChange={(e, value)=>{
                   setCurrentPage(value)
                   params.page =value;
-                  navigate(`/admin/orders/list/${value}`)
+                  navigate(`/admin/orders/page/${value}`)
                 }
                }
               
@@ -75,7 +85,6 @@ const ListOrderAd = () => {
           <TableHead>
             <TableRow>
               <TableCell />
-              <TableCell align="left">Mã đơn hàng</TableCell>
               <TableCell align="left">Người đặt</TableCell>
               <TableCell align="center">Số Điện thoại</TableCell>
               <TableCell align="center">Email</TableCell>
@@ -86,13 +95,14 @@ const ListOrderAd = () => {
               <TableCell align="center">Trạng Thái</TableCell>
               <TableCell align="center">Ngày Tạo</TableCell>
               <TableCell align="center">Ngày cập nhật</TableCell>
+              <TableCell align="center">Chức năng</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {
               (orders === undefined)?null:orders.map((item, index)=>{
                 console.log(item);
-                return <RowTableDescription order={item} key={index} />
+                return <RowTableDescription order={item} key={index} reload={loadOrders}/>
               })
             }
           </TableBody>
@@ -108,12 +118,12 @@ export default ListOrderAd
 
 
 const RowTableDescription = (props) => {
-  console.log(props.order);
   const params = useParams();
   const [open, setOpen] = useState(false);
   const order = props.order
   const [total, setTotal] = useState(0);
   const [status, setStatus] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
 
   const loadTotal = useCallback(()=>{
     let sum = 0;
@@ -123,6 +133,55 @@ const RowTableDescription = (props) => {
     }
     setTotal(sum);
   }, [order, params])
+
+  const handleDelete = ()=>{
+    swal({
+      title: "Chú ý",
+      text: "Bạn có chắc chắn muốn xóa không",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        swal("Đã xóa", {
+          icon: "success",
+        });
+        // feedbackService.delete(feedback.id)
+        // .then((response)=>{
+        //   props.reload()
+        //   swal("Đã xóa", {
+        //     icon: "success",
+        //   });
+        // })
+        // .catch(function (error) {
+        //   swal("Lỗi", "", "error");
+        //   console.log(error);
+        // })
+        
+      }
+    });
+  }
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
+  const handleSubmitStatus = () => {
+    let radio = document.getElementsByName('status')
+    // for(let i in radio){
+    //   if(radio[i].checked === true){
+    //     feedbackService.updateStatus(feedback.id, radio[i].value)
+    //     .then((response)=>{
+    //       props.reload()
+    //       setOpenDialog(false);
+    //       swal("Đã cập nhật Trạng thái thành công", "", "success");
+    //     })
+    //     .catch((error)=>{
+    //       console.log(error);
+    //       swalErrorAPI(error)
+    //     })
+    //   }
+    // }
+  };
 
 
   const loadStatus = useCallback(()=>{
@@ -176,10 +235,9 @@ const RowTableDescription = (props) => {
             size="small"
             onClick={() => setOpen(!open)}
           >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            {open ? <i className='bx bx-chevron-up _iconBase' />: <i className='bx bx-chevron-down _iconBase'/>}
           </IconButton>
         </TableCell>
-        <TableCell align="left" title={order.id}>{order.id}</TableCell>
         <TableCell>{order.user.firstName + " " + order.user.lastName}</TableCell>
         <TableCell align="center">{order.user.phoneNumber}</TableCell>
         <TableCell align="center">{order.user.email}</TableCell>
@@ -190,13 +248,49 @@ const RowTableDescription = (props) => {
         <TableCell align="center">{status}</TableCell>
         <TableCell align="center">{formatDate(order.timeCreate) }</TableCell>
         <TableCell align="center">{formatDate(order.timeUpdate)}</TableCell>
+        <TableCell align='center'>
+          <Box sx={{ height: 80, transform: 'translateZ(0px)', flexGrow: 1 }}>
+            <SpeedDial
+              ariaLabel="SpeedDial basic example"
+              sx={{ position: 'absolute', right: 5, top: 12 }}
+              icon={<i className='bx bxs-pencil _bxs-base'></i>}
+              direction="left"
+            >
+              {
+                actions.map((action, index) => (
+                    <SpeedDialAction
+                      key={index}
+                      icon={action.icon}
+                      tooltipTitle={action.name}
+                      onClick={(e)=>{
+                        switch (action.link.trim()) {
+                          case "delete":{
+                           handleDelete()
+                           break;
+                          }
+                          case "status":{
+                            setOpenDialog(true);
+                            break;
+                          }
+                          default:
+                           
+                            break;
+                        }
+                        
+                      }}
+                    />
+                ))
+              }
+            </SpeedDial>
+          </Box>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
-                Danh sách các sản phẩm trong đơn
+                Mã Đơn hàng: {order.id}
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
@@ -224,6 +318,36 @@ const RowTableDescription = (props) => {
           </Collapse>
         </TableCell>
       </TableRow>
+          <Dialog
+            open={openDialog}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {"Hãy chọn trạng thái cần thay đổi"}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                <FormControl>
+                  <FormLabel id="demo-radio-buttons-group-label">Trạng thái</FormLabel>
+                  <RadioGroup
+                    aria-labelledby="demo-radio-buttons-group-label"
+                    defaultValue="female"
+                    name="radio-buttons-group"
+                  >
+                    <FormControlLabel name='status' value={0} control={<Radio />} label="chưa xác nhận" />
+                    <FormControlLabel name='status' value={1} control={<Radio />} label="Đã xác nhận" />
+                    <FormControlLabel name='status' value={2} control={<Radio />} label="Đã Hủy" />
+                  </RadioGroup>
+                </FormControl>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Quay lại</Button>
+              <Button onClick={handleSubmitStatus} >Xác nhận</Button>
+            </DialogActions>
+          </Dialog>
     </React.Fragment>
   )
 }

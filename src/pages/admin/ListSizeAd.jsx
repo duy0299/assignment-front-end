@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import DeleteIcon from '@mui/icons-material/Delete';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -23,9 +22,9 @@ const actions = [
     link:"name" 
   },
   { 
-    icon: <DeleteIcon />, 
+    icon: <i className='bx bx-trash _bxs-base'/>, 
     name: 'Xóa', 
-    link:"" 
+    link:"delete" 
   }
 ]
 
@@ -36,6 +35,7 @@ const ListSizeAd = () => {
   const loadSizes = useCallback(()=>{
     sizeService.getAll()
         .then((response)=>{
+          console.log(response.data.result);
           setSizes(response.data.result)
         })
         .catch((error)=>{
@@ -91,6 +91,7 @@ const ListSizeAd = () => {
             <TableRow>
               <TableCell align="left">STT</TableCell>
               <TableCell align="left">Tên</TableCell>
+              <TableCell align="center">Sản phẩm Phụ thuộc</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
               <TableCell align="center">Ngày tạo</TableCell>
               <TableCell align="center">Ngày cập nhật gần nhất</TableCell>
@@ -101,7 +102,7 @@ const ListSizeAd = () => {
           {
               (sizes)?sizes.map((item, index)=>(
 
-                <RowTable size={item} key={index} reLoad={loadSizes}  stt={index} />
+                <RowTable size={item} key={index} reload={loadSizes}  stt={index} />
               )):null
             }
           </TableBody>
@@ -150,16 +151,65 @@ const RowTable = (props) => {
   const navigate = useNavigate()
   const [size, setSize] = useState(props.size);
 
+  const handleChangeName = ()=>{
+    swal("Nhập vào tên mới:", {
+      content: "input",
+    })
+    .then((value) => {
+      if(!value){return null}
+      if(value.trim()!==""){
+        sizeService.update(size.id, value)
+        .then((response)=>{
+          props.reload()
+          swal("Đã đổi tên thành công", "", "success");
+        })
+        .catch((error)=>{
+          console.log(error);
+          swal("Lỗi", "", "error");
+        })
+      }
+      
+    });
+  }
+
+  const handleDelete = ()=>{
+    swal({
+      title: "Chú ý",
+      text: "Bạn có chắc chắn muốn xóa không",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+        if (willDelete) {
+          swal("Đã xóa", {
+            icon: "success",
+          });
+          sizeService.delete(size.id)
+          .then((response)=>{
+           props.reload()
+            swal("Đã xóa",  '', 'success');
+          })
+          .catch(function (error) {
+            swal("Lỗi", "", "error");
+            console.log(error);
+          })
+        
+        }
+      });
+  }
+
   useEffect(() => {
     setSize(props.size)
     
-  }, []);
+  }, [props]);
   
   
   return (     
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={props.key}>
         <TableCell>{props.stt+1}</TableCell>
         <TableCell align="left">{size.name}</TableCell>
+        <TableCell align="center">{size.productDto.length}</TableCell>
         <TableCell align="center">{(size.status)?"Bình thường":"Ngừng sử dụng"}</TableCell>
         <TableCell align="center">{formatDate(size.timeCreate) }</TableCell>
         <TableCell align="center">{formatDate(size.timeUpdate)}</TableCell>
@@ -179,53 +229,12 @@ const RowTable = (props) => {
                       tooltipTitle={action.name}
                       onClick={(e)=>{
                         switch (action.link.trim()) {
-                          case "":{
-                            swal({
-                              title: "Chú ý",
-                              text: "Bạn có chắc chắn muốn xóa không",
-                              icon: "warning",
-                              buttons: true,
-                              dangerMode: true,
-                            })
-                            .then((willDelete) => {
-                                if (willDelete) {
-                                  swal("Đã xóa", {
-                                    icon: "success",
-                                  });
-                                  // sizeService.delete(size.id)
-                                  // .then((response)=>{
-                                  //  props.action()
-                                  //   swal("Đã xóa", {
-                                  //     icon: "success",
-                                  //   });
-                                  // })
-                                  // .catch(function (error) {
-                                  //   swal("Lỗi", "", "error");
-                                  //   console.log(error);
-                                  // })
-                                
-                                }
-                              });
+                          case "delete":{
+                            handleDelete()
                             break;
                           }
                           case "name":{
-                            swal("Nhập vào tên mới:", {
-                              content: "input",
-                            })
-                            .then((value) => {
-                              if(value.trim()!==""){
-                                sizeService.update(size.id, value)
-                                .then((response)=>{
-                                  swal("Đã đổi tên thành công", "", "success");
-                                  props.reLoad()
-                                })
-                                .catch((error)=>{
-                                  console.log(error);
-                                  swal("Lỗi", "", "error");
-                                })
-                              }
-                              
-                            });
+                            handleChangeName()
                             break;
                           }
                           default:{

@@ -1,3 +1,4 @@
+import cookies from '../utils/cookies';
 import service, {sizePage} from './setingAPI';
 
 const feedbackService = {
@@ -23,11 +24,7 @@ const feedbackService = {
     },
 
     updateStatus : async (id, status) => {
-      return await service.put("/feedback/"+id+"/status", {
-        params: {
-          status: status
-        }
-      })
+      return await service.put("/feedback/"+id+"/status?status="+status)
     },
 
     delete : async (id) => {

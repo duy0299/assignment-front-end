@@ -10,12 +10,9 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import userService from '../../service/userService';
 import swal from 'sweetalert';
 import { Avatar, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, PaginationItem, Radio, RadioGroup, SpeedDial, SpeedDialAction } from '@mui/material';
@@ -29,7 +26,7 @@ const actions = [
     link:"status" 
   },
   { 
-    icon: <DeleteIcon />, 
+    icon: <i className='bx bx-trash _bxs-base'/>, 
     name: 'Xóa', 
     link:"delete" 
   },
@@ -77,6 +74,7 @@ const role = [
 
 
 const ListUserAd = () => {
+  const navigate = useNavigate();
   const params = useParams();
   const [users, setUsers] = useState(undefined);
   const [currentPage, setCurrentPage] = useState(params.page);
@@ -116,18 +114,10 @@ const ListUserAd = () => {
                onChange={(e, value)=>{
                   setCurrentPage(value)
                   params.page =value;
+                  navigate(`/admin/users/page/${value}`)
                 }
                }
-              renderItem={(item) => {
-                return(
-                    <PaginationItem
-                      
-                      component={Link}
-                      to={`/admin/users/list/${item.page}`}
-                      {...item}
-                    />
-                )    
-              }}
+              
             />
           </Stack>
           
@@ -181,7 +171,6 @@ const RowTableHistory = (props) => {
         .then((response)=>{
           props.reLoad()
           swal("Đã cập nhật Trạng thái thành công", "", "success");
-          props.reLoad()
         })
         .catch((error)=>{
           console.log(error);
@@ -235,7 +224,7 @@ const RowTableHistory = (props) => {
             size="small"
             onClick={() => setOpen(!open)}
           >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            {open ? <i className='bx bx-chevron-up _iconBase' />: <i className='bx bx-chevron-down _iconBase'/>}
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row" align="center"><Avatar alt="Remy Sharp" src={user.avatar} /></TableCell>
@@ -274,6 +263,7 @@ const RowTableHistory = (props) => {
                             })
                             .then((willDelete) => {
                               if (willDelete) {
+                                props.reLoad()
                                 swal("Đã xóa", {
                                   icon: "success",
                                 });

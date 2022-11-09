@@ -1,5 +1,6 @@
 import service from './setingAPI';
 
+
 const categoriesService = {
   
     getAll : async () => {

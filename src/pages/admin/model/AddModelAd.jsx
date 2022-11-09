@@ -1,24 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react'
-// import PropTypes from 'prop-types';
 import imageAvatar from '../../../assets/images/default/438x438.jpg'
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import {useNavigate, useParams } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import swal from 'sweetalert';
 import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import categoriesService from '../../../service/categoriesService';
 import sizeService from '../../../service/sizeService';
 import productModelService from '../../../service/productModelService';
 import addAvatar from '../../../utils/addAvatar';
-import addImages from '../../../utils/addImages';
+// import addImages from '../../../utils/addImages';
+import swalErrorAPI from '../../../utils/swalErrorAPI';
 
 
 
 const AddModelAd = () => {
   const navigate = useNavigate()
-  const [category, setCategory] = useState(0);
   const [categories, setCategories] = useState(undefined);
-  const [listPreview, setListPreview] = useState(null);
   const [sizes, setSizes] = useState(undefined);
   
   // count product in model
@@ -26,47 +24,44 @@ const AddModelAd = () => {
 
 
 
-  const handleSubmit = useCallback((e)=>{
+  const handleSubmit = (e)=>{
     e.preventDefault();
     let formData = new FormData(document.getElementById('formAddModel'));
     productModelService.insertWithProducts(formData)
-                        .then((response)=>{
-                          console.log(response.data.result);
-                          swal({
-                            title: "Thành  công",
-                            icon: "success",
-                            button: "Về trang danh sách"
-                            })
-                        .then(( value ) =>  { 
-                          navigate("/admin/models/page/1")
-                        } ) ;
-                        })
-                        .catch((error)=>{
-                          console.log(error);
-                            
-                        });
-  },[])
+    .then((response)=>{
+      swal({
+        title: "Thành  công",
+        icon: "success",
+        button: "Về trang danh sách"
+        })
+    .then(( value ) =>  { 
+      navigate("/admin/models/page/1")
+    } ) ;
+    })
+    .catch((error)=>{
+      console.log(error);
+      swalErrorAPI(error)
+    });
+  }
 
   const loadCategories = useCallback(()=>{
     categoriesService.getAll()
         .then((response)=>{
-          console.log(response.data.result);
           setCategories(response.data.result)
         })
         .catch((error)=>{
           console.log(error);
-            
+          swalErrorAPI(error)
         });
   },[])
   const loadSizes = useCallback(()=>{
     sizeService.getAll()
-        .then((response)=>{
-          console.log(response.data.result);
+        .then((response)=>{;
           setSizes(response.data.result)
         })
         .catch((error)=>{
           console.log(error);
-            
+          swalErrorAPI(error)
         })
   },[])
 
@@ -79,10 +74,6 @@ const AddModelAd = () => {
     // addImages('btnImages', 'inputImages', 'divImages')
   }, []);
 
-  // useEffect(() => {
-  //   loadmodels()
-  // }, []);
-  
 
   return (     
     <div className='_ad-lists-model'>
@@ -179,7 +170,7 @@ const AddModelAd = () => {
                     /><br/><br/>
                     <TextField
                         fullWidth 
-                        label="Giảm"
+                        label="Giá thây đổi"
                         type="number"
                         name='priceSale'
                         InputLabelProps={{
@@ -232,12 +223,9 @@ const AddModelAd = () => {
             </Grid>
           </Grid>
         </Box>
-
         <div className='_submit-add-model'>
           <Button type='submit' variant="outlined" >Add</Button>
         </div>
-        
-      
       </form>
     </div>
   )

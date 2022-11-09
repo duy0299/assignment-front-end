@@ -1,7 +1,5 @@
-import { AppBar,  Avatar,  Box,  Divider,  Drawer,  Grid,  IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Toolbar, Tooltip, Typography } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import MailIcon from '@mui/icons-material/Mail';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
+import { AppBar,  Avatar,  Box,   Drawer,  IconButton,  Menu, MenuItem, Toolbar, Tooltip, Typography } from '@mui/material';
+
 import React, { useEffect } from 'react'
 
 import TabMenuLeft from '../../components/admin/TabMenuLeft';
@@ -10,13 +8,10 @@ import userService from '../../service/userService';
 import { useState } from 'react';
 import { useCallback } from 'react';
 import swal from 'sweetalert';
-import { useLocation, useNavigate } from 'react-router-dom';
-// import cookies from '../../utils/cookies';
+import {useNavigate } from 'react-router-dom';
+import cookies from '../../utils/cookies';
 
 
-
-
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const LayoutAd = (props) => {
     const navigate = useNavigate();
     const [menu, setMenu] = useState(false);
@@ -36,11 +31,14 @@ const LayoutAd = (props) => {
     };
     const LoadAdmin = useCallback(()=>{
         toggleDrawer(false)
+       
         userService.getWithToken()
         .then((response)=>{
+           
             for (const role of response.data.result.listRole) {
                 if(role === "ADMIN" || role === "FEEDBACK_MANAGER" || role === "ORDER_MANAGER" || 
                     role === "WAREHOUSE_MANAGER" || role === "USER_MANAGER"  ){
+                        
                         SetAdmin(response.data.result);
                         return true;
                 }
@@ -67,8 +65,12 @@ const LayoutAd = (props) => {
                 navigate("/login")
             } ) ;
         })
-    })
-
+    },[])
+    const handleLogout = ()=>{
+        cookies.deleteUser();
+        setAnchorElUser(null);
+        navigate("/login")
+    }
  
 
     useEffect(() => {
@@ -107,13 +109,13 @@ const LayoutAd = (props) => {
                             sx={{ mr: 2 }}
                             onClick={toggleDrawer(true)}
                         >
-                            <MenuIcon />
+                            <i className='bx bx-menu _iconBase'/>
                             
                             
                         </IconButton>
                         
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            News
+                           
                         </Typography>
                         <IconButton
                             size="large"
@@ -122,7 +124,7 @@ const LayoutAd = (props) => {
                             aria-label="menu"
                             sx={{ mr: 2 }}
                         >
-                            <MailIcon/>
+                            <i className='bx bxs-envelope _iconBase'></i>
                         </IconButton>
                         
                         <Box sx={{ flexGrow: 0 }}>
@@ -147,11 +149,15 @@ const LayoutAd = (props) => {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                             >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                <Typography textAlign="center">{setting}</Typography>
+                                <MenuItem key={1} onClick={handleCloseUserMenu}>
+                                    <Typography textAlign="center">Trang điều khiển</Typography>
                                 </MenuItem>
-                            ))}
+                                <MenuItem key={2} onClick={handleCloseUserMenu}>
+                                    <Typography textAlign="center">Cài đặt</Typography>
+                                </MenuItem>
+                                <MenuItem key={3} onClick={handleLogout}>
+                                    <Typography textAlign="center">Đăng xuất</Typography>
+                                </MenuItem>
                             </Menu>
                         </Box>
                     </Toolbar>

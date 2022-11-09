@@ -1,3 +1,4 @@
+import cookies from '../utils/cookies';
 import service, {serviceImage, sizePage} from './setingAPI';
 
 const productModelService = {
@@ -7,6 +8,11 @@ const productModelService = {
           params: {
             page: page,
             size: sizePage
+          }
+        }, 
+        {
+          headers: {
+            "Authorization": `Bearer ${(cookies.getUser()!==null)?cookies.getUser().token:""}`
           }
         })
       return response;
@@ -56,9 +62,12 @@ const productModelService = {
       return await service.get("/model/"+id)
     },
 
-    getAll : async (page) => {
-      console.log(page, sizePage);
-      const response = await service.get("/models", {
+    getAll : async () => {
+      const response = await service.get("/models")
+      return response;
+    },
+    getByPage : async (page) => {
+      const response = await service.get("/models/With-page", {
         params: {
           page: page,
           size: sizePage
@@ -82,9 +91,7 @@ const productModelService = {
       return response;
     },
     updateStatus : async (id, status) => {
-      const response = await service.delete("/model/"+id+"/status", {
-        status: status
-      })
+      const response = await service.put("/model/"+id+"/status?status="+status)
       return response;
     },
     delete : async (id) => {

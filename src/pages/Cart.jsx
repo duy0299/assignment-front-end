@@ -71,7 +71,7 @@ const Cart = () => {
                             </Link>
                         </Button>
                         
-                        <Link to="/catalog/1">
+                        <Link to="/catalog/page/1">
                             <Button size="block">
                                 Tiếp tục mua hàng
                             </Button>

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
 
-import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,12 +8,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import DeleteIcon from '@mui/icons-material/Delete';
 import swal from 'sweetalert';
 import formatDate from '../../../utils/formatDate';
 import categoriesService from '../../../service/categoriesService';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, SpeedDial, SpeedDialAction } from '@mui/material';
+import { Box, SpeedDial, SpeedDialAction } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const actions = [
@@ -23,7 +20,7 @@ const actions = [
     name: 'Thông tin', 
   },
   { 
-    icon: <DeleteIcon />, 
+    icon: <i className='bx bx-trash _bxs-base'/>, 
     name: 'Xóa'
   }
 ]

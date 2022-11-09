@@ -1,11 +1,17 @@
 import axios from 'axios';
+import cookies from '../utils/cookies';
 
 import service from './setingAPI';
 
 const wishlistService = {
   
     getById : async (id) => {
-        const response = await service.get("/wishlist/"+id)
+        const response = await service.get("/wishlist/"+id, 
+        {
+          headers: {
+            "Authorization": `Bearer ${(cookies.getUser()!==null)?cookies.getUser().token:""}`
+          }
+        })
           return response;
     },
 

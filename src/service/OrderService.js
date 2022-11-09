@@ -1,3 +1,4 @@
+import cookies from '../utils/cookies';
 import service, { sizePage } from './setingAPI';
 
 const orderService = {
@@ -17,15 +18,6 @@ const orderService = {
     },
     
     insert : async (address, note, cartProducts) => {
-      let listProduct = [];
-      for (const i in cartProducts) {
-        let productCart = {
-          productId: i.productId,
-          quantity: i.quantity,
-        }
-        listProduct.push(productCart);
-      }
-     
         const response = await service.post("/order", {
             address: address,
             listProduct: cartProducts,

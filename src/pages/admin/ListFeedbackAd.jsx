@@ -13,16 +13,26 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
 import {useNavigate, useParams } from 'react-router-dom';
 import swal from 'sweetalert';
-import { Avatar} from '@mui/material';
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, SpeedDial, SpeedDialAction} from '@mui/material';
 import formatDate from '../../utils/formatDate';
-import formatVND from '../../utils/formatVND';
-import numberWithCommas from '../../utils/numberWithCommas';
 import feedbackService from '../../service/feedbackService';
+import swalErrorAPI from '../../utils/swalErrorAPI';
 
+const actions = [
+  { 
+    icon: <i className='bx bx-station _bxs-base'/>, 
+    name: 'Trạng thái', 
+    link:"status" 
+  },
+  { 
+    icon: <i className='bx bx-trash _bxs-base'/>, 
+    name: 'Xóa', 
+    link:"delete" 
+  },
+]
 
 
 const ListFeedbackAd = () => {
@@ -41,7 +51,7 @@ const ListFeedbackAd = () => {
         })
         .catch((error)=>{
           console.log(error);
-            
+          swalErrorAPI(error) 
         })
   },[currentPage])
 
@@ -67,7 +77,7 @@ const ListFeedbackAd = () => {
                 onChange={(e, value)=>{
                   setCurrentPage(value)
                   params.page =value;
-                  navigate(`/admin/feedbacks/list/${value}`)
+                  navigate(`/admin/feedbacks/page/${value}`)
                 }
                }
             />
@@ -86,12 +96,13 @@ const ListFeedbackAd = () => {
               <TableCell align="center">Trạng Thái</TableCell>
               <TableCell align="center">Ngày Tạo</TableCell>
               <TableCell align="center">Ngày cập nhật</TableCell>
+              <TableCell align='center'>Chức năng</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {
               (feedbacks)?feedbacks.map((item, index)=>{
-                return <RowTableDescription feedback={item} key={index} stt={index}/>
+                return <RowTableDescription feedback={item} key={index} stt={index} reload={loadFeedbacks}/>
                 
               }):null
             }
@@ -106,11 +117,13 @@ const ListFeedbackAd = () => {
 export default ListFeedbackAd
 
 
-
+// Row
 const RowTableDescription = (props) => {
+
     const params = useParams();
     const [open, setOpen] = useState(false);
-    const [feedback, setFeedback] = useState(props.feedback);
+    const [openDialog, setOpenDialog] = useState(false);
+    const feedback = props.feedback
     const [status, setStatus] = useState({
       code:1,
       text: ""
@@ -144,11 +157,59 @@ const RowTableDescription = (props) => {
           break;
       }
     }, [feedback, params])
+    
+    const handleClose = () => {
+      setOpenDialog(false);
+    };
+    const handleSubmitStatus = () => {
+      let radio = document.getElementsByName('status')
+      for(let i in radio){
+        if(radio[i].checked === true){
+          feedbackService.updateStatus(feedback.id, radio[i].value)
+          .then((response)=>{
+            props.reload()
+            setOpenDialog(false);
+            swal("Đã cập nhật Trạng thái thành công", "", "success");
+          })
+          .catch((error)=>{
+            console.log(error);
+            swalErrorAPI(error)
+          })
+        }
+      }
+    };
+    const handleDelete = () => {
+      swal({
+        title: "Chú ý",
+        text: "Bạn có chắc chắn muốn xóa không",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+          swal("Đã xóa", {
+            icon: "success",
+          });
+          // feedbackService.delete(feedback.id)
+          // .then((response)=>{
+          //   props.reload()
+          //   swal("Đã xóa", {
+          //     icon: "success",
+          //   });
+          // })
+          // .catch(function (error) {
+          //   swal("Lỗi", "", "error");
+          //   console.log(error);
+          // })
+          
+        }
+      });
+    };
 
   useEffect(() => {
-    setFeedback(props.feedback)
     loadStatus()
-  }, [props.feedback,  params]);
+  }, [props,  params]);
   
   
   return (     
@@ -160,7 +221,7 @@ const RowTableDescription = (props) => {
             size="small"
             onClick={() => setOpen(!open)}
           >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            {open ? <i className='bx bx-chevron-up _iconBase' />: <i className='bx bx-chevron-down _iconBase'/>}
           </IconButton>
         </TableCell>
         <TableCell align="left">{props.stt}</TableCell>
@@ -170,6 +231,42 @@ const RowTableDescription = (props) => {
         <TableCell align="center"><p className={"_status-"+status.code}>{status.text}</p></TableCell>
         <TableCell align="center">{formatDate(feedback.timeCreate) }</TableCell>
         <TableCell align="center">{formatDate(feedback.timeUpdate)}</TableCell>
+        <TableCell align='center'>
+          <Box sx={{ height: 80, transform: 'translateZ(0px)', flexGrow: 1 }}>
+            <SpeedDial
+              ariaLabel="SpeedDial basic example"
+              sx={{ position: 'absolute', right: 5, top: 12 }}
+              icon={<i className='bx bxs-pencil _bxs-base'></i>}
+              direction="left"
+            >
+              {
+                actions.map((action, index) => (
+                    <SpeedDialAction
+                      key={index}
+                      icon={action.icon}
+                      tooltipTitle={action.name}
+                      onClick={(e)=>{
+                        switch (action.link.trim()) {
+                          case "delete":{
+                            handleDelete()
+                            break;
+                          }
+                          case "status":{
+                            setOpenDialog(true);
+                            break;
+                          }
+                          default:
+                           
+                            break;
+                        }
+                        
+                      }}
+                    />
+                ))
+              }
+            </SpeedDial>
+          </Box>
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
@@ -186,6 +283,36 @@ const RowTableDescription = (props) => {
           </Collapse>
         </TableCell>
       </TableRow>
+          <Dialog
+            open={openDialog}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {"Hãy chọn trạng thái cần thay đổi"}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                <FormControl>
+                  <FormLabel id="demo-radio-buttons-group-label">Trạng thái</FormLabel>
+                  <RadioGroup
+                    aria-labelledby="demo-radio-buttons-group-label"
+                    defaultValue="female"
+                    name="radio-buttons-group"
+                  >
+                    <FormControlLabel name='status' value={0} control={<Radio />} label="Thư rác" />
+                    <FormControlLabel name='status' value={1} control={<Radio />} label="Chưa xem" />
+                    <FormControlLabel name='status' value={2} control={<Radio />} label="Đã xem" />
+                  </RadioGroup>
+                </FormControl>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Quay lại</Button>
+              <Button onClick={handleSubmitStatus} >Xác nhận</Button>
+            </DialogActions>
+          </Dialog>
     </React.Fragment>
   )
 }

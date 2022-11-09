@@ -20,6 +20,7 @@ const EditModelAd = () => {
     productModelService.getById(params.id)
         .then((response)=>{
           setModel(response.data.result)
+          setCategory(response.data.result.categories.id)
         })
         .catch((error)=>{
           console.log(error);
@@ -61,8 +62,6 @@ const EditModelAd = () => {
                           swal("Lỗi", " ", "error");
                         });
   }
-
-
 
 
   useEffect(() => {

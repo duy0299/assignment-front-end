@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import swal from 'sweetalert'
 import PropTypes from 'prop-types'
 
 import Button from './Button'
-
+import { LoadQuantityCart } from '../pages/Layout'
 import numberWithCommas from '../utils/numberWithCommas'
 import formatVND from '../utils/formatVND'
 import cookies from '../utils/cookies';
@@ -16,7 +16,7 @@ const user = (cookies.getUser()!==null)?cookies.getUser():"";
 
 const ProductView = props => {
     let productModel = props.productModel
-    
+    const loadQuantityCart = useContext(LoadQuantityCart);
     // main image review
     const [previewImg, setPreviewImg] = useState(productModel.listImages[0])
     const [descriptionExpand, setDescriptionExpand] = useState(false)
@@ -35,6 +35,7 @@ const ProductView = props => {
         wishlistService.insert(productModel.id)
                 .then(function (response) {
                     console.log(response.data);
+                    props.reLoadModel()
                     swal (
                             {
                             title: "Thành  công",
@@ -55,7 +56,7 @@ const ProductView = props => {
     const removeWishlist = useCallback((e)=>{
         wishlistService.delete(productModel.id)
                 .then(function (response) {
-                    console.log(response.data);
+                    props.reLoadModel()
                     swal (
                             {
                             title: "Thành  công",
@@ -89,9 +90,6 @@ const ProductView = props => {
     }
 
     const addToCart = useCallback(() => {
-        console.log(quantity);
-        console.log(product);
-        
         if (check()) {
             let item = {
                 productId: product.id,
@@ -102,6 +100,7 @@ const ProductView = props => {
                 quantity: quantity
             }
             cartSession.addToCart(item, "default");
+            loadQuantityCart((cartSession.getCart())?cartSession.getCart().length:0)
         }
     }, [quantity, product])
 
@@ -163,7 +162,8 @@ const ProductView = props => {
                 <div className="product__info__item" key="r1">
                     <span className="product__info__item__price">
                         {(product!== undefined) ? 
-                            <ComponentPrice priceRoot={productModel.priceRoot} 
+                            <ComponentPrice 
+                                priceRoot={productModel.priceRoot} 
                                 priceFrom={productModel.priceFrom} 
                                 priceTo={productModel.priceTo}
                                 currentPrice={product.currentPrice}
@@ -215,7 +215,7 @@ const ProductView = props => {
                         </div>
                         <span className= "product__info__item__quantity__favourite">
                             <Link>
-                                {(wishlist)?<i className='bx bxs-heart'></i>:<i className='bx bx-heart'></i>}
+                                {(wishlist)?<i className='bx bxs-heart' onClick={removeWishlist}></i>:<i className='bx bx-heart' onClick={addWishlist}></i>}
                             </Link>
                         </span>
                     </div>
@@ -248,7 +248,7 @@ ProductView.propTypes = {
 
 export default ProductView
    // component
-   let ComponentPrice = (props) =>{
+   const ComponentPrice = (props) =>{
     if(props.currentPrice === undefined){
         if(props.priceFrom ===  props.priceTo){
             return (
