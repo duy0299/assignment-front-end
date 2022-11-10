@@ -1,40 +1,42 @@
+import axios from 'axios';
 import cookies from '../utils/cookies';
-import service, {serviceImage, sizePage} from './setingAPI';
+import service, {serviceImage, sizePage, urlAPI} from './setingAPI';
 const userService = {
     getById : async (id) => {
-        let user = (cookies.getUser())?cookies.getUser():'';
-        return await service.get("/user/"+id, 
-        {
-          headers: {
-            "Authorization": `Bearer ${(user!=='')?user.token:""}`
-          }
-        })
-    },
-    
-
-    getWithToken : async () => {
-        return await service.get("/user/with-token", 
-        {
+        return await axios.get(urlAPI+"/user/"+id, {
           headers: {
             "Authorization": `Bearer ${(cookies.getUser()!==null)?cookies.getUser().token:""}`
           }
         })
     },
     
+
+    getWithToken : async () => {
+        return await axios.get(urlAPI+"/user/with-token", {
+          headers: {
+            "Authorization": `Bearer ${(cookies.getUser()!==null)?cookies.getUser().token:""}`
+          }
+        }
+        )
+    },
+    
     getByPage : async (page) => {
-        return await service.get("/users",{
+        return await axios.get(urlAPI+"/users",{
             params: {
               page: page,
               size: sizePage
+            },
+            headers: {
+              "Authorization": `Bearer ${(cookies.getUser()!==null)?cookies.getUser().token:""}`
             }
           })
     },
     
     updateStatus : async (id, status) => {
-        return await service.put("/user/"+id+"/status", {
-            id : id,
-            status : status
-        })
+        return await axios.put(urlAPI+"/user/"+id+"/status?status="+status,{
+        headers: {
+          "Authorization": `Bearer ${(cookies.getUser()!==null)?cookies.getUser().token:""}`
+        }})
     },
     updatePassword : async (password, newPassword, passwordConfirmation) => {
       return await service.put("/user/with-token/password", {

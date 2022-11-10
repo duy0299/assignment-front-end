@@ -1,13 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react'
 // import PropTypes from 'prop-types';
-import imageAvatar from '../../../assets/images/default/438x438.jpg'
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import {useNavigate, useParams } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import swal from 'sweetalert';
-import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import categoriesService from '../../../service/categoriesService';
-import productModelService from '../../../service/productModelService';
+import swalErrorAPI from '../../../utils/swalErrorAPI';
 
 
 
@@ -15,7 +13,7 @@ const AddCategoryAd = () => {
   const navigate = useNavigate()
   const [categories, setCategories] = useState(undefined);
 
-  const handleSubmit = useCallback((e)=>{
+  const handleSubmit = (e)=>{
     e.preventDefault();
     
     const name = document.getElementById('name').value;
@@ -23,23 +21,22 @@ const AddCategoryAd = () => {
     const parentCategoriesId = document.getElementById('parentCategoriesId').value;
 
     categoriesService.insert(name, description, parentCategoriesId)
-                        .then((response)=>{
-                          console.log(response.data.result);
-                          swal({
-                            title: "Thành  công",
-                            icon: "success",
-                            button: "Về trang danh sách"
-                            })
-                        .then(( value ) =>  { 
-                          navigate("/admin/categories")
-                        } ) ;
-                        })
-                        .catch((error)=>{
-                          console.log(error);
-                            
-                        });
-  },[])
-
+    .then((response)=>{
+      console.log(response.data.result);
+      swal({
+        title: "Thành  công",
+        icon: "success",
+        button: "Về trang danh sách"
+        })
+    .then(( value ) =>  { 
+      navigate("/admin/categories")
+    } ) ;
+    })
+    .catch((error)=>{
+      swalErrorAPI(error)
+        
+    });
+  }
 
   const loadCategories = useCallback(()=>{
     categoriesService.getAll()
@@ -57,14 +54,10 @@ const AddCategoryAd = () => {
     loadCategories();
   }, []);
 
-  // useEffect(() => {
-  //   loadmodels()
-  // }, []);
-  
 
   return (     
     <div className='_ad-lists-model'>
-      <form onSubmit={handleSubmit} id="formAddModel" enctype="multipart/form-data">
+      <form onSubmit={handleSubmit}  enctype="multipart/form-data">
         {/* phần insert categories */}
         <Box sx={{ flexGrow: 1 ,
                   '& .MuiTextField-root': { m: 1, width: '100%' },
@@ -91,6 +84,7 @@ const AddCategoryAd = () => {
                   <InputLabel id="categoryID">Loại Cấp trên</InputLabel>
                   <Select
                     fullWidth
+                    defaultValue={"null"}
                     name='parentCategoriesId'
                     id='parentCategoriesId'
                     labelId="categoryID"

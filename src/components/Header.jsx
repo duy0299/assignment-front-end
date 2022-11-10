@@ -1,12 +1,10 @@
-import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
-import React, { useRef, useEffect, useCallback, useState } from 'react'
-import { createContext } from 'react'
+import { Avatar, Box, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
+import React, { useRef, useEffect, useCallback, useState, useContext } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import swal from 'sweetalert'
 
 import logo from '../assets/images/Logo-2.png'
-import userService from '../service/userService'
-import cartSession from '../utils/cartSession'
+import { LoadLayout } from '../pages/Layout'
 import changeToSlug from '../utils/changeToSlug'
 import cookies from '../utils/cookies'
 import Button from './Button'
@@ -32,26 +30,16 @@ const mainNav = [
 
 
 const Header = (props) => {
-    
+    const loadLayout = useContext(LoadLayout);
     const {pathname} = useLocation();
     const navigate = useNavigate();
     const activeNav = mainNav.findIndex(e=> e.path === pathname)
     const headerRef = useRef(null)
     const menuLeft = useRef(null);
-    const [user, setUser] = useState(undefined);
-
+    const user = props.user;
+    
     const [anchorElUser, setAnchorElUser] = useState(null);
-
-    const LoadUser = useCallback(()=>{
-        userService.getWithToken()
-        .then((response)=>{
-            console.log(response.data.result);
-            setUser(response.data.result);
-        })
-        .catch((error)=>{
-            console.log(error);
-        })
-    },[])
+    
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
@@ -70,17 +58,18 @@ const Header = (props) => {
                 headerRef.current.classList.remove('shrink')
             }
         }
-    })
+    },[])
     const handleLogout = ()=>{
         cookies.deleteUser();
         setAnchorElUser(null);
+        loadLayout.reloadUser();
         navigate("/login")
     }
     const handleNavigateMyAccount = (e)=>{
         setAnchorElUser(null);
         navigate("/my-account")
     }
-    const clickSearch = useCallback(() => {
+    const clickSearch = () => {
         swal({
             text: 'Nhập vào tên sản phẩm bạn muốn tìm',
             content: "input",
@@ -96,7 +85,7 @@ const Header = (props) => {
             swal.close();
           })
           
-    })
+    }
 // hàm dùng khi cuộn màn hình xuống
     useEffect(() => {
         window.addEventListener("scroll", scrollhandler)
@@ -104,10 +93,7 @@ const Header = (props) => {
             window.removeEventListener('scroll', scrollhandler)
         };
     }, []);
-    useEffect(() => {
-        LoadUser()
-        
-    }, []);
+    
     useEffect(() => {
     }, [props]);
     
@@ -160,9 +146,9 @@ const Header = (props) => {
                             ?
                             <Box>
                                 <Tooltip title="Open settings">
-                                    <IconButton onClick={handleOpenUserMenu}  sx={{ 0: 0 }}>
+                                    <a href="javascript:void(0)" onClick={handleOpenUserMenu}>
                                         <Avatar alt="Remy Sharp" src={(user)?user.avatar:logo} />
-                                    </IconButton>
+                                    </a>
                                 </Tooltip>
                                 <Menu
                                     sx={{ mt: '45px' }}
@@ -180,6 +166,9 @@ const Header = (props) => {
                                     open={Boolean(anchorElUser)}
                                     onClose={handleCloseUserMenu}
                                 >
+                                    <MenuItem key={0} onClick={handleCloseUserMenu}>
+                                        <Typography textAlign="center">{user.firstName + " " + user.lastName}</Typography>
+                                    </MenuItem>
                                     <MenuItem key={1} onClick={handleNavigateMyAccount}>
                                         <Typography textAlign="center">Trang Cá nhân</Typography>
                                     </MenuItem>

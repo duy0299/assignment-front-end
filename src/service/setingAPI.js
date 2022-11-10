@@ -4,7 +4,7 @@ import cookies from '../utils/cookies';
 
 const urlAPI = "http://localhost:8080";
 
-const sizePage = 7;
+const sizePage = 4;
 
 
 const service = axios.create({
@@ -14,6 +14,7 @@ const service = axios.create({
       }
     }
 )
+
 const serviceImage = axios.create({
     baseURL: urlAPI,
     headers: {
@@ -26,4 +27,4 @@ const serviceImage = axios.create({
 
 export default service;
 
-export {sizePage, serviceImage}
+export {sizePage, serviceImage, urlAPI}

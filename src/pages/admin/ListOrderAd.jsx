@@ -20,6 +20,7 @@ import formatVND from '../../utils/formatVND';
 import numberWithCommas from '../../utils/numberWithCommas';
 import orderService from '../../service/orderService';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, SpeedDial, SpeedDialAction } from '@mui/material';
+import swalErrorAPI from '../../utils/swalErrorAPI';
 
 const actions = [
   { 
@@ -31,6 +32,37 @@ const actions = [
     icon: <i className='bx bx-trash _bxs-base'/>, 
     name: 'Xóa', 
     link:"delete" 
+  },
+]
+
+const statusRadio = [
+  { 
+    name: 'Huỷ đơn', 
+    value:0 
+  },
+  { 
+    name: 'chưa xác nhận', 
+    value:1 
+  },
+  { 
+    name: 'đã xác nhận', 
+    value:2 
+  },
+  { 
+    name: 'đã thanh toán', 
+    value:3 
+  },
+  { 
+    name: 'đã đóng gói', 
+    value:4 
+  },
+  { 
+    name: 'đang vận chuyển', 
+    value:5
+  },
+  { 
+    name: 'đã hoàn thành', 
+    value:6
   },
 ]
 
@@ -49,7 +81,7 @@ const ListOrderAd = () => {
         })
         .catch((error)=>{
           console.log(error);
-            
+          swalErrorAPI(error)
         })
   },[currentPage])
 
@@ -128,7 +160,7 @@ const RowTableDescription = (props) => {
   const loadTotal = useCallback(()=>{
     let sum = 0;
     for (const item of order.listItems) {
-      console.log(item);
+      
         sum +=(item.product.currentPrice * item.quantity);
     }
     setTotal(sum);
@@ -147,17 +179,17 @@ const RowTableDescription = (props) => {
         swal("Đã xóa", {
           icon: "success",
         });
-        // feedbackService.delete(feedback.id)
-        // .then((response)=>{
-        //   props.reload()
-        //   swal("Đã xóa", {
-        //     icon: "success",
-        //   });
-        // })
-        // .catch(function (error) {
-        //   swal("Lỗi", "", "error");
-        //   console.log(error);
-        // })
+        orderService.delete(order.id)
+        .then((response)=>{
+          props.reload()
+          swal("Đã xóa", {
+            icon: "success",
+          });
+        })
+        .catch(function (error) {
+          swalErrorAPI(error)
+          console.log(error);
+        })
         
       }
     });
@@ -167,20 +199,23 @@ const RowTableDescription = (props) => {
   };
   const handleSubmitStatus = () => {
     let radio = document.getElementsByName('status')
-    // for(let i in radio){
-    //   if(radio[i].checked === true){
-    //     feedbackService.updateStatus(feedback.id, radio[i].value)
-    //     .then((response)=>{
-    //       props.reload()
-    //       setOpenDialog(false);
-    //       swal("Đã cập nhật Trạng thái thành công", "", "success");
-    //     })
-    //     .catch((error)=>{
-    //       console.log(error);
-    //       swalErrorAPI(error)
-    //     })
-    //   }
-    // }
+    let flat = true;
+    for(let i in radio){
+      if(radio[i].checked === true){
+        flat = false;
+        orderService.updateStatus(order.id, radio[i].value)
+        .then((response)=>{
+          props.reload()
+          setOpenDialog(false);
+          swal("Đã cập nhật Trạng thái thành công", "", "success");
+        })
+        .catch((error)=>{
+          console.log(error);
+          swalErrorAPI(error)
+        })
+      }
+    }
+    if(flat){swal("chú ý", "Chưa chọn trạng thái mới", "warning")}
   };
 
 
@@ -336,9 +371,11 @@ const RowTableDescription = (props) => {
                     defaultValue="female"
                     name="radio-buttons-group"
                   >
-                    <FormControlLabel name='status' value={0} control={<Radio />} label="chưa xác nhận" />
-                    <FormControlLabel name='status' value={1} control={<Radio />} label="Đã xác nhận" />
-                    <FormControlLabel name='status' value={2} control={<Radio />} label="Đã Hủy" />
+                    {
+                      statusRadio.map((item, index)=>(
+                        <FormControlLabel key={index} name='status' value={item.value} control={<Radio />} label={item.name} />
+                      ))
+                    }
                   </RadioGroup>
                 </FormControl>
               </DialogContentText>

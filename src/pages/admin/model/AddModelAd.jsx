@@ -130,7 +130,7 @@ const AddModelAd = () => {
             </Grid>
             <Grid item xs={4}>
               <Stack spacing={2} direction="row">
-                <Button variant="outlined" id="btnImages"> Chọn hình ảnh </Button>
+                <Button variant="outlined" id="btnImages" onClick={(e)=>{document.getElementById('inputImages').click()}}> Chọn hình ảnh </Button>
                   <input
                     id="inputImages"
                       name="images"

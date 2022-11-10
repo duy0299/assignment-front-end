@@ -25,6 +25,7 @@ import AddModelAd from '../pages/admin/model/AddModelAd'
 import EditModelAd from '../pages/admin/model/EditModelAd'
 import AddCategoryAd from '../pages/admin/categories/AddCategoryAd'
 import AddProductsAd from '../pages/admin/product/AddProductsAd'
+import EditCategoryAd from '../pages/admin/categories/EditCategoryAd'
 
 const HomePage = <Layout><Home/></Layout>;
 const ProductPage = <Layout><Product/></Layout>;
@@ -73,6 +74,7 @@ const PageRouter = () => {
 
                 {/* edit */}
                 <Route path='/admin/model/:id/info'  element={<LayoutAd><EditModelAd/></LayoutAd>}/>
+                <Route path='/admin/category/:id/info'  element={<LayoutAd><EditCategoryAd/></LayoutAd>}/>
                 
 
                 

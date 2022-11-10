@@ -80,6 +80,10 @@ const productModelService = {
       const response = await serviceImage.post("/model/with-products", data)
       return response;
     },
+    updateImages : async (id, data) => {
+      const response = await serviceImage.put("/model/"+id+"/images", data)
+      return response;
+    },
     updateInfo : async (id, name, description, priceRoot, categoriesID) => {
       console.log(id, name, description, priceRoot, categoriesID);
       const response = await serviceImage.put("/model/"+id+"/info", {

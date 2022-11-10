@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
-
+import React, { useEffect, useState } from 'react'
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,57 +10,58 @@ import Paper from '@mui/material/Paper';
 import swal from 'sweetalert';
 import formatDate from '../../../utils/formatDate';
 import categoriesService from '../../../service/categoriesService';
-import { Box, SpeedDial, SpeedDialAction } from '@mui/material';
+import { Box, Button, SpeedDial, SpeedDialAction } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import swalErrorAPI from '../../../utils/swalErrorAPI';
 
 const actions = [
   { 
     icon: <i className='bx bx-info-circle _bxs-base'></i>, 
     name: 'Thông tin', 
+    link: 'info'
   },
   { 
     icon: <i className='bx bx-trash _bxs-base'/>, 
-    name: 'Xóa'
+    name: 'Xóa',
+    link: 'delete'
   }
 ]
 
 const ListCategoriesAd = () => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState(undefined);
 
-  const loadCategories = useCallback(()=>{
+  const loadCategories = ()=>{
     categoriesService.getAll()
         .then((response)=>{
-          console.log(response.data.result);
           setCategories(response.data.result)
         })
         .catch((error)=>{
           console.log(error);
             
         })
-  },[])
+  }
 
 
 
   useEffect(() => {
-    
     loadCategories()
   }, []);
 
-  // useEffect(() => {
-  //   loadUsers()
-  // }, []);
-  
+
 
   return (     
     <div className='_ad-lists-user'>
       <h1>Danh Sách Loại sản phẩm</h1>
-       <TableContainer component={Paper}>
+      <Button onClick={()=>{navigate('/admin/category')}} variant="outlined" id="_inp-form-add" style={{ marginRight:'10%'}}> Thêm Loại sản phẩm </Button>
+       <TableContainer component={Paper} style={{width:'80%',  margin:'0 10%'}}>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
               <TableCell align="left">STT</TableCell>
               <TableCell align="left">Tên</TableCell>
               <TableCell align="left">Mô Tả</TableCell>
+              <TableCell align="center">Số sản phẩm phụ thuộc</TableCell>
               <TableCell align="left">Loại cấp dưới</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
               <TableCell align="center">Ngày tạo</TableCell>
@@ -72,7 +72,7 @@ const ListCategoriesAd = () => {
           <TableBody>
           {
               (categories)?categories.map((item, index)=>(
-                <RowTable category={item} key={index}  stt={index} reLoad={loadCategories}/>
+                <RowTable category={item} key={index}  stt={index} reload={loadCategories}/>
               )):null
             }
           </TableBody>
@@ -88,15 +88,47 @@ export default ListCategoriesAd
 
 
 const RowTable = (props) => {
-  const category = props.category
+  const [category, setCategory] = useState(props.category);
   const navigate = useNavigate();
+  const handleDelete = () => {
+    swal({
+      title: "Chú ý",
+      text: "Bạn có chắc chắn muốn xóa không",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        props.reload()
+        swal("Đã xóa", {
+          icon: "success",
+        });
+        categoriesService.delete(category.id)
+        .then((response)=>{
+          swal("Đã xóa", {
+            icon: "success",
+          });
+        })
+        .catch(function (error) {
+          swalErrorAPI(error)
+          console.log(error);
+        })
+      }
+    });
+  };
 
+  useEffect(() => {
+    setCategory(props.category)
+  
+  }, [props]);
 
   return (     
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={props.key}>
+      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={props.stt}>
         <TableCell>{props.stt +1}</TableCell>
         <TableCell align="left">{category.name}</TableCell>
         <TableCell align="left">{category.description}</TableCell>
+        <TableCell align="center">{category.listModel.length}</TableCell>
         <TableCell align="left">
           {
             (category.listChildren.length > 0)?category.listChildren.map((item,  index)=>{
@@ -108,7 +140,7 @@ const RowTable = (props) => {
             }):"Không có"
           }
         </TableCell>
-        <TableCell align="center">{(category.status)?"Bình thường":"Ngừng sử dụng"}</TableCell>
+        <TableCell align="center"> {(category.status)?'Bình thường':<p className={"_status-0"}>Ngừng sử dụng</p>}</TableCell>
         <TableCell align="center">{formatDate(category.timeCreate) }</TableCell>
         <TableCell align="center">{formatDate(category.timeUpdate)}</TableCell>
         <TableCell align='center'>
@@ -126,39 +158,13 @@ const RowTable = (props) => {
                       icon={action.icon}
                       tooltipTitle={action.name}
                       onClick={(e)=>{
-                        switch (action.name.trim()) {
-                          case "xóa":{
-                            swal({
-                              title: "Chú ý",
-                              text: "Bạn có chắc chắn muốn xóa không",
-                              icon: "warning",
-                              buttons: true,
-                              dangerMode: true,
-                            })
-                            .then((willDelete) => {
-                              if (willDelete) {
-                                swal("Đã xóa", {
-                                  icon: "success",
-                                });
-                                categoriesService.delete(category.id)
-                                .then((response)=>{
-                                  props.reLoad()
-                                  swal("Đã xóa", {
-                                    icon: "success",
-                                  });
-                                })
-                                .catch(function (error) {
-                                  swal("Lỗi", "", "error");
-                                  console.log(error);
-                                })
-                                
-                              }
-                            });
+                        switch (action.link.trim()) {
+                          case "delete":{
+                            handleDelete()
                             break;
                           }
-                          
                           default:
-                            navigate("/admin/model/"+category.id+"/info")
+                            navigate("/admin/category/"+category.id+"/info")
                             break;
                         }
                         

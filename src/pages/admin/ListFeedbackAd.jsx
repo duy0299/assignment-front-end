@@ -191,17 +191,17 @@ const RowTableDescription = (props) => {
           swal("Đã xóa", {
             icon: "success",
           });
-          // feedbackService.delete(feedback.id)
-          // .then((response)=>{
-          //   props.reload()
-          //   swal("Đã xóa", {
-          //     icon: "success",
-          //   });
-          // })
-          // .catch(function (error) {
-          //   swal("Lỗi", "", "error");
-          //   console.log(error);
-          // })
+          feedbackService.delete(feedback.id)
+          .then((response)=>{
+            props.reload()
+            swal("Đã xóa", {
+              icon: "success",
+            });
+          })
+          .catch(function (error) {
+            swal("Lỗi", "", "error");
+            console.log(error);
+          })
           
         }
       });

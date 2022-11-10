@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, useRef } from 'react'
+import React, { useCallback, useState, useEffect, useRef, useContext } from 'react'
 import {  useNavigate, useParams } from 'react-router-dom'
 import { Accordion,  AccordionSummary,  Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 import swal from 'sweetalert'
@@ -10,9 +10,12 @@ import Grid from '../components/Grid'
 import userService from '../service/userService';
 import cookies from '../utils/cookies';
 import addAvatar from '../utils/addAvatar';
+import { LoadLayout } from './Layout';
+import swalErrorAPI from '../utils/swalErrorAPI';
 
 const MyAccount = () => {
     const navigate = useNavigate();
+
     const params = useParams();
     const [user, setUser] = useState(undefined)
     const [content, setContent] = useState('info')
@@ -159,7 +162,8 @@ export default MyAccount
 
 
 const ContentPage = (props)=>{
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
+    const loadLayout = useContext(LoadLayout);
     const [gender, setGender] = useState(props.user.gender);
     
     const handleChange = (event) => {
@@ -168,14 +172,20 @@ const ContentPage = (props)=>{
     const handleSubmitAvatar = (e) => {
         e.preventDefault();
         let formData = new FormData(document.getElementById('formSubmitAvatar'));
-        userService.updateAvatar(formData)
-        .then((response)=>{
-            swal("Thây đổi thành công", " ", "success");
-        })
-        .catch((error)=>{
-            console.log(error);
-            swal("Thây đổi thành công", "error.response", "error");
-        });
+        if(document.getElementById('inputAvatar-').files.length > 0){
+            userService.updateAvatar(formData)
+            .then((response)=>{
+                swal("cập nhật thành công", " ", "success");
+                loadLayout.reloadUser()
+            })
+            .catch((error)=>{
+                console.log(error);
+                swalErrorAPI(error)
+            });
+        }else{
+            swal("Bạn chưa chọn Avatar mới", " ", "warning");
+        }
+        
     };
     const handleSubmitInfo = (e) => {
         e.preventDefault();
@@ -195,7 +205,7 @@ const ContentPage = (props)=>{
         })
         .catch((error)=>{
             console.log(error);
-            swal("Thây đổi thành công", "error.response", "error");
+            swalErrorAPI(error)
         });
 
     };
@@ -207,20 +217,20 @@ const ContentPage = (props)=>{
         
         userService.updatePassword(password, newPassword, passwordConfirmation)
         .then((response)=>{
-            swal("Thây đổi thành công", " ", "success");
+            swal("Cập nhật thành công", " ", "success");
         })
         .catch((error)=>{
             console.log(error);
-            swal("Thây đổi thành công", "error.response", "error");
+            swalErrorAPI(error)
         });
 
     };
+
     useEffect(()=>{
         setGender(props.user.gender)
         if(props.content === 'info'){
             addAvatar('btnAvatar-', 'inputAvatar-', 'imgAvatar-');
         }
-        
     },[props])
 
     switch (props.content) {
@@ -240,7 +250,7 @@ const ContentPage = (props)=>{
                                 smCol={1}
                                 gap={20}    
                             >
-                                <input
+                                <input 
                                     id={"inputAvatar-"}
                                     name="fileAvatar"
                                     type="file"

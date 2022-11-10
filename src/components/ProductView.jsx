@@ -3,20 +3,22 @@ import swal from 'sweetalert'
 import PropTypes from 'prop-types'
 
 import Button from './Button'
-import { LoadQuantityCart } from '../pages/Layout'
+import { LoadLayout } from '../pages/Layout'
 import numberWithCommas from '../utils/numberWithCommas'
 import formatVND from '../utils/formatVND'
 import cookies from '../utils/cookies';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import wishlistService from '../service/wishlistService'
 import cartSession from '../utils/cartSession'
+import swalErrorAPI from '../utils/swalErrorAPI'
 
 const user = (cookies.getUser()!==null)?cookies.getUser():"";
 
 
 const ProductView = props => {
+    const navigate = useNavigate();
     let productModel = props.productModel
-    const loadQuantityCart = useContext(LoadQuantityCart);
+    const loadLayout = useContext(LoadLayout);
     // main image review
     const [previewImg, setPreviewImg] = useState(productModel.listImages[0])
     const [descriptionExpand, setDescriptionExpand] = useState(false)
@@ -34,7 +36,6 @@ const ProductView = props => {
     const addWishlist = useCallback((e)=>{
         wishlistService.insert(productModel.id)
                 .then(function (response) {
-                    console.log(response.data);
                     props.reLoadModel()
                     swal (
                             {
@@ -44,13 +45,8 @@ const ProductView = props => {
                     )
                 })
                 .catch(function (error) {
-                    if(error.response.data.message == null){
-                        swal("Lỗi", error.response.data.result, "error");
-                    }else{
-                        swal("Lỗi", error.response.data.message, "error");
-                    }
-                    
                     console.log(error);
+                    swalErrorAPI(error)
                 })
     })
     const removeWishlist = useCallback((e)=>{
@@ -65,11 +61,7 @@ const ProductView = props => {
                     )
                 })
                 .catch(function (error) {
-                    if(error.response.data.message == null){
-                        swal("Lỗi", error.response.data.result, "error");
-                    }else{
-                        swal("Lỗi", error.response.data.message, "error");
-                    }
+                    swalErrorAPI(error)
                     console.log(error);
                 })
     })
@@ -100,20 +92,24 @@ const ProductView = props => {
                 quantity: quantity
             }
             cartSession.addToCart(item, "default");
-            loadQuantityCart((cartSession.getCart())?cartSession.getCart().length:0)
+            loadLayout.setQuantityInCart((cartSession.getCart())?cartSession.getCart().length:0)
         }
     }, [quantity, product])
 
     const goToCart = () => {
         if (check()) {
-            // let newItem = {
-            //     slug: productModel.slug,
-            //     size: size,
-            //     price: productModel.price,
-            //     quantity: quantity
-            // }
-            props.history.push('/cart')
+            let item = {
+                productId: product.id,
+                name: product.name,
+                avatar: product.avatar,
+                price: product.currentPrice,
+                size: product.size.name,
+                quantity: quantity
+            }
+            cartSession.addToCart(item, "default");
+            loadLayout.setQuantityInCart((cartSession.getCart())?cartSession.getCart().length:0)
         }
+        navigate('/cart')
     }
 
     // useEffect

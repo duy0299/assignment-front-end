@@ -6,7 +6,7 @@
     }
 
     &__filter {
-        width: 20%;
+        width: 200px;
 
         @include tablet {
             width: max-content;
@@ -96,4 +96,8 @@
 ._choose{
     color: rgb(253, 105, 18);
     font-weight: bold;
+}
+
+._catalog__filterLeft{
+    margin-right: 5rem;
 }

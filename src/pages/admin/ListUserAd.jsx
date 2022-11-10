@@ -17,6 +17,7 @@ import userService from '../../service/userService';
 import swal from 'sweetalert';
 import { Avatar, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, PaginationItem, Radio, RadioGroup, SpeedDial, SpeedDialAction } from '@mui/material';
 import formatDate from '../../utils/formatDate';
+import swalErrorAPI from '../../utils/swalErrorAPI';
 
 
 const actions = [
@@ -83,7 +84,6 @@ const ListUserAd = () => {
   const loadUsers = useCallback(()=>{
     userService.getByPage(currentPage)
         .then((response)=>{
-          console.log(response.data);
           setUsers(response.data.result)
           setTotalPage(response.data.totalPage)
         })
@@ -100,9 +100,6 @@ const ListUserAd = () => {
     loadUsers()
   }, [currentPage]);
 
-  // useEffect(() => {
-  //   loadUsers()
-  // }, []);
   
 
   return (     
@@ -142,7 +139,7 @@ const ListUserAd = () => {
             {
               (users)?users.map((item, index)=>(
 
-                <RowTableHistory user={item} key={index} reLoad={loadUsers}/>
+                <RowTableHistory user={item} key={index} reload={loadUsers}/>
               )):null
             }
           </TableBody>
@@ -162,6 +159,7 @@ const RowTableHistory = (props) => {
   const [user, setUser] = useState(props.user);
   const [openDialogStatus, setOpenDialogStatus] = useState(false);
   const [openDialogRole, setOpenDialogRole] = useState(false);
+  const [roles, setRoles] = useState([]);
 
   const handleChangeStatus = () => {
     let radio = document.getElementsByName('status')
@@ -169,12 +167,12 @@ const RowTableHistory = (props) => {
       if(radio[i].checked === true){
         userService.updateStatus(user.id, radio[i].value)
         .then((response)=>{
-          props.reLoad()
+          props.reload()
           swal("Đã cập nhật Trạng thái thành công", "", "success");
         })
         .catch((error)=>{
           console.log(error);
-          swal("Lỗi", "", "error");
+          swalErrorAPI(error)
         })
       }
     }
@@ -191,17 +189,42 @@ const RowTableHistory = (props) => {
     if(valueRole.length >  0){
       userService.updateRoles(user.id, valueRole)
         .then((response)=>{
-          props.reLoad()
+          props.reload()
           swal("Đã cập nhật phân quyền thành công", "", "success");
         })
         .catch((error)=>{
           console.log(error);
-          swal("Lỗi", "", "error");
+          swalErrorAPI(error)
         })
     }
-    console.log(valueRole);
   };
-
+  const handleDelete = () => {
+    swal({
+      title: "Chú ý",
+      text: "Bạn có chắc chắn muốn xóa không",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        props.reload()
+        swal("Đã xóa", {
+          icon: "success",
+        });
+        userService.delete(user.id)
+        .then((response)=>{
+          swal("Đã xóa", {
+            icon: "success",
+          });
+        })
+        .catch(function (error) {
+          swalErrorAPI(error)
+          console.log(error);
+        })
+      }
+    });
+  };
   const handleCloseDialogStatus = () => {
     setOpenDialogStatus(false);
   };
@@ -209,8 +232,53 @@ const RowTableHistory = (props) => {
     setOpenDialogRole(false);
   };
 
+  
+  const loadRole = ()=>{
+    let listRole = [];
+    for (const i of user.listRole) {
+      switch (i) {
+        case "BAN":{
+            listRole.push("Bị cấm")
+            break;
+        }
+        case "ADMIN":{
+            listRole.push("Quản trị viên")
+            break;
+        }
+        case "USER":{
+            listRole.push("User")
+            break;
+        }
+        case "BAN_COMMENT":{
+            listRole.push("Cấm bình luận")
+            break;
+        }
+        case "FEEDBACK_MANAGER":{
+            listRole.push("Quản lý phản ánh của khách hàng")
+            break;
+        }
+        case "WAREHOUSE_MANAGER":{
+            listRole.push("Quản lý Kho")
+            break;
+        }
+        case "USER_MANAGER":{
+            listRole.push("Quản lý User")
+            break;
+        }
+        case "ORDER_MANAGER":{
+            listRole.push("Quản lý Đơn")
+            break;
+        }
+        
+        default:
+          break;
+      }
+    }
+    setRoles(listRole);
+  }
+
   useEffect(() => {
-    
+    loadRole();
     setUser(props.user)
   }, [props]);
   
@@ -234,7 +302,7 @@ const RowTableHistory = (props) => {
         <TableCell align="center">{user.email}</TableCell>
         <TableCell align="center">{user.gender}</TableCell>
         <TableCell align="center">{user.phoneNumber}</TableCell>
-        <TableCell align="center">{(user.status)?"Bình thường":"Bị Cấm"}</TableCell>
+        <TableCell align="center">{(user.status)?<p>Bình thường</p>:<p className='_status-0'>Bị Cấm</p>}</TableCell>
         <TableCell align="center">{formatDate(user.timeCreate) }</TableCell>
         <TableCell align="center">{formatDate(user.timeUpdate)}</TableCell>
         <TableCell align='center'>
@@ -254,31 +322,7 @@ const RowTableHistory = (props) => {
                       onClick={(e)=>{
                         switch (action.link.trim()) {
                           case "delete":{
-                            swal({
-                              title: "Chú ý",
-                              text: "Bạn có chắc chắn muốn xóa không",
-                              icon: "warning",
-                              buttons: true,
-                              dangerMode: true,
-                            })
-                            .then((willDelete) => {
-                              if (willDelete) {
-                                props.reLoad()
-                                swal("Đã xóa", {
-                                  icon: "success",
-                                });
-                                userService.delete(user.id)
-                                .then((response)=>{
-                                  swal("Đã xóa", {
-                                    icon: "success",
-                                  });
-                                })
-                                .catch(function (error) {
-                                  swal("Lỗi", "", "error");
-                                  console.log(error);
-                                })
-                              }
-                            });
+                            handleDelete()
                             break;
                           }
                           case "status":{
@@ -306,6 +350,20 @@ const RowTableHistory = (props) => {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
+          <Box sx={{ margin: 1}}>
+              <Table size="small" aria-label="purchases">
+                <TableBody>
+                  <TableRow style={{maxWidth:'90%'}}>
+                    <TableCell key={"indexx"} align="center" > Phân quyền:  </TableCell>
+                    {
+                      roles.map((item, index)=>(
+                        <TableCell key={index} align="left" > {item} </TableCell>
+                      ))
+                    } 
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Box>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
                 Lịch Sử
@@ -320,10 +378,9 @@ const RowTableHistory = (props) => {
                 </TableHead>
                 <TableBody>
                   <TableRow>
-                    <TableCell align="center" > {user.listOrder.length} </TableCell>
-                    <TableCell  align="center">{user.listFeedbacks.length}</TableCell>
-                    <TableCell align="center">{user.listRatings.length}</TableCell>
-                    
+                    <TableCell align="center" key={"index1"}> {user.listOrder.length} </TableCell>
+                    <TableCell  align="center" key={"index2"}>{user.listFeedbacks.length}</TableCell>
+                    <TableCell align="center" key={"index3"}>{user.listRatings.length}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>

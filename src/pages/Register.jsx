@@ -7,6 +7,7 @@ import Grid from '../components/Grid'
 import '../sass/components/_form-register.scss'
 
 import authService from "../service/authService";
+import swalErrorAPI from '../utils/swalErrorAPI';
 import validate from '../utils/validate';
 
 const Register = () => {
@@ -27,8 +28,7 @@ const Register = () => {
                 authService.register(firstName, lastName, phone, gender, email, password, passwordConfirmation)
                 .then(function (response) {
                     console.log(response.data);
-                    swal (
-                            {
+                    swal ({
                             title: "Thành  công",
                             text: "chuyển về trang đăng nhập",
                             icon: "success",
@@ -40,16 +40,7 @@ const Register = () => {
                     } ) ;
                 })
                 .catch(function (error) {
-                    if(error.response){
-                        if(error.response.data.message == null){
-                            swal("Lỗi", error.response.data.result, "error");
-                        }else{
-                            swal("Lỗi", error.response.data.message, "error");
-                        }
-                    }else{
-                        swal("Lỗi", error.message, "error");
-                    }
-                    
+                    swalErrorAPI(error)
                     console.log(error);
                 })
             } catch (error) {

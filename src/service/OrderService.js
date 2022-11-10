@@ -1,4 +1,3 @@
-import cookies from '../utils/cookies';
 import service, { sizePage } from './setingAPI';
 
 const orderService = {
@@ -26,9 +25,7 @@ const orderService = {
           return response;
     },
     updateStatus : async (id, status) => {
-        const response = await service.put("/order/"+id+"/status", {
-            status: status
-        })
+        const response = await service.put("/order/"+id+"/status?status="+status)
           return response;
     },
     delete : async (id) => {

@@ -1,12 +1,12 @@
 import swal from "sweetalert";
 
 const  swalErrorAPI = (error)=>{
-    let flat = false;
+    let flat = true;
     if(error.response){
         if(error.response.data){
             if(error.response.data.message){
                 swal("Lỗi", error.response.data.message, "error");
-                flat = true;
+                flat = false;
               }
         }
     } 

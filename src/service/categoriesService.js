@@ -14,10 +14,11 @@ const categoriesService = {
 
 
     insert : async (name, description, parentCategoriesId) => {
+      let parent = (parentCategoriesId==='null')?null:parentCategoriesId;
       const response = await service.post("/category", {
           name: name,
           description: description,
-          parentCategoriesId: parentCategoriesId
+          parentCategoriesId: parent
       })
       return response;
     },

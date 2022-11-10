@@ -1,4 +1,3 @@
-import axios from 'axios';
 import cookies from '../utils/cookies';
 
 import service from './setingAPI';
@@ -28,7 +27,11 @@ const wishlistService = {
     },
     
     updateStatus : async (id, status) => {
-      return await service.put("/wishlist/status/"+id, {status : status})
+      return await service.put("/wishlist/status/"+id, {
+        params: {
+          status: status
+        }
+      })
     },
 
     delete : async (id) => {

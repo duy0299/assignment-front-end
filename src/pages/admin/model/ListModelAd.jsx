@@ -13,7 +13,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Rating, SpeedDial, SpeedDialAction } from '@mui/material';
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Grid, ImageList, ImageListItem, Radio, RadioGroup, Rating, SpeedDial, SpeedDialAction } from '@mui/material';
 import {useNavigate, useParams } from 'react-router-dom';
 import swal from 'sweetalert';
 import formatDate from '../../../utils/formatDate';
@@ -77,6 +77,7 @@ const ListModelAd = () => {
   return (     
     <div className='_ad-lists-model'>
       <h1>Danh sách Mẫu sản phẩm</h1>
+      <Button onClick={()=>{navigate('/admin/model')}} variant="outlined" id="_inp-form-add"> Thêm Mẫu sản phẩm </Button>
         <div className='_pagination'>
           <Stack spacing={2}>
             <Pagination  count={totalPage} color="primary" 
@@ -111,7 +112,7 @@ const ListModelAd = () => {
           <TableBody>
             {
               (models)?models.map((item, index)=>{
-                return <RowTableDescription model={item} key={index} reLoad={loadModels}/>
+                return <RowTableDescription model={item} key={index} reload={loadModels}/>
                 
               }):null
             }
@@ -133,7 +134,9 @@ const RowTableDescription = (props) => {
   const [open, setOpen] = useState(false);
   const model = props.model
   const [start, setStart] = useState(0);
+  const [images, setImages] = useState(model.listImages);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialogImages, setOpenDialogImages] = useState(false);
 
   const loadStart = useCallback(()=>{
     if(model.listRating.length === 0){
@@ -143,7 +146,6 @@ const RowTableDescription = (props) => {
         for (const item of model.listRating) {
             sum +=item.rating;
         }
-       
         setStart(sum/model.listRating.length);
     }
       
@@ -155,7 +157,7 @@ const RowTableDescription = (props) => {
       if(radio[i].checked === true){
         productModelService.updateStatus(model.id, radio[i].value)
         .then((response)=>{
-          props.reLoad()
+          props.reload()
           swal("Đã cập nhật Trạng thái thành công", "", "success");
         })
         .catch((error)=>{
@@ -166,14 +168,35 @@ const RowTableDescription = (props) => {
     }
   };
 
+  const handleChangeImages = (e) => {
+    e.preventDefault();
+    let formData = new FormData(document.getElementById('formEditImage'));
+    productModelService.updateImages(model.id, formData)
+    .then((response)=>{
+      swal({
+        title: "Thành  công",
+        icon: "success",
+        })
+    })
+    .catch((error)=>{
+      console.log(error);
+      swalErrorAPI(error)
+    });
+  };
   const handleClose = () => {
     setOpenDialog(false);
+  };
+  const handleCloseDialogImages = () => {
+    setOpenDialogImages(false);
   };
   useEffect(() => {
     loadStart()
   }, [props.model,  params]);
+
+
+
   
-  
+
   return (     
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={props.key} hover={true}>
@@ -254,7 +277,7 @@ const RowTableDescription = (props) => {
                             break;
                           }
                           case 'images':{
-                            navigate("/admin/model/"+model.id+"/images");
+                            setOpenDialogImages(true);
                             break;
                           }
                         
@@ -325,6 +348,67 @@ const RowTableDescription = (props) => {
               <Button onClick={handleClose}>Quay lại</Button>
               <Button onClick={handleSubmitStatus} >Xác nhận</Button>
             </DialogActions>
+          </Dialog>
+          <Dialog
+            open={openDialogImages}
+            onClose={handleCloseDialogImages}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <form id='formEditImage' onSubmit={handleChangeImages}>
+              <DialogTitle id="alert-dialog-title">
+                {"Chọn lại hình ảnh"}
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  <FormControl>
+                    <RadioGroup
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      defaultValue="female"
+                      name="radio-buttons-group"
+                    >
+                        <input type="file" id='inputImages'  hidden name="images" multiple enctype="multipart/form-data"
+                                onChange={(e)=>{
+                                  let data = [];
+                                  for (let i = 0; i <  e.target.files.length; i++) {
+                                    const fileReader = new FileReader()
+                                    fileReader.readAsDataURL(e.target.files[i])
+                                    fileReader.onload = function() {
+                                      const url = fileReader.result
+                                      data.push(url)
+                                    }
+                                  }
+                                  setImages(data)
+                                  props.reload()
+                                }} 
+                          />
+                        <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
+                          {
+                            images.map((item, index) => (
+                              <ImageListItem key={index}>
+                                <img
+                                  src={item}
+                                  alt='images'
+                                  loading="lazy"
+                                />
+                              </ImageListItem>
+                            ))
+                          }
+                        </ImageList>
+                        <Button style={{width:'30%', margin:'10px 35%'}} variant="outlined" id="btnImages" onClick={(e)=>{
+                          document.getElementById('inputImages').click()
+                          setImages([])
+                        }}
+                          > Chọn hình ảnh </Button>
+                    </RadioGroup>
+                  </FormControl>
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseDialogImages}>Quay lại</Button>
+                <Button type='submit' >Xác nhận</Button>
+              </DialogActions>
+            </form>
           </Dialog>
     </React.Fragment>
   )

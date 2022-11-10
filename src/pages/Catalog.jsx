@@ -1,17 +1,15 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Accordion, AccordionDetails, AccordionSummary, Pagination, Stack, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Pagination, Stack, TextField, Typography } from '@mui/material';
 import swal from 'sweetalert'
 
 import Helmet from '../components/Helmet'
 import CheckBox from '../components/CheckBox'
-
 import Button from '../components/Button'
-
-import productModelService  from '../service/productModelService'
 import Grid from '../components/Grid'
 import ProductCard from '../components/ProductCard'
 
+import productModelService  from '../service/productModelService'
 import categoriesService from '../service/categoriesService'
 import sizeService from '../service/sizeService'
 
@@ -30,6 +28,8 @@ const Catalog = () => {
     const [sizes, setSizes] = useState(undefined)
     const [filter, setFilter] = useState(initFilter)
     const [totalPage, setTotalPage] = useState(1)
+    const [priceTo, setPriceTo] = useState(0)
+    const [priceFrom, setPriceFrom] = useState(0)
 
     
 
@@ -216,10 +216,9 @@ const Catalog = () => {
 
     useEffect(() => {
         updateProducts()
-    }, [updateProducts])
+    }, [priceTo, priceFrom])
 
     const filterRef = useRef(null)
-
     const showHideFilter = () => filterRef.current.classList.toggle('active')
 
     if(Number.isNaN(params.page)){
@@ -228,9 +227,34 @@ const Catalog = () => {
     return (
         <Helmet title="Sản phẩm">
             <div className="catalog">
-                <div className="catalog__filter" ref={filterRef}>
+                <div className="catalog__filter _catalog__filterLeft" ref={filterRef}>
                     <div className="catalog__filter__close" onClick={() => showHideFilter()}>
                         <i className="bx bx-left-arrow-alt"></i>
+                    </div>
+                    <div className="catalog__filter__widget">
+                        <div className="catalog__filter__widget__title">
+                            Bộ lọc
+                        </div>
+                        <div className="catalog__filter__widget__content">
+                            <h2>Giá</h2>
+                        <Box sx={{ flexGrow: 1, marginTop:3,  '& .MuiTextField-root': { m: 1, width: '80%' } }}>
+                            <TextField
+                                fullWidth 
+                                defaultValue={0}
+                                type={'number'}
+                                name="priceFrom"
+                                label="Từ"
+                            />
+                                <TextField
+                                fullWidth 
+                                defaultValue={0}
+                                type={'number'}
+                                name="priceTo"
+                                label="Đến"
+                            />
+                        </Box>
+                            
+                        </div>
                     </div>
                     <div className="catalog__filter__widget">
                         <div className="catalog__filter__widget__title">
@@ -292,26 +316,6 @@ const Catalog = () => {
                             </nav>
                         </div>
                     </div>
-
-                    <div className="catalog__filter__widget">
-                        <div className="catalog__filter__widget__title">
-                            kích cỡ
-                        </div>
-                        <div className="catalog__filter__widget__content">
-                            {
-                                (sizes)?sizes.map((item, index) => (
-                                    <div key={index} className="catalog__filter__widget__content__item">
-                                        <CheckBox
-                                            label={item.name}
-                                            onchange={(input) => filterSelect("SIZE", input.checked, item)}
-                                            checked={filter.size.includes(item.id)}
-                                        />
-                                    </div>
-                                )):null
-                            }
-                        </div>
-                    </div>
-
                     <div className="catalog__filter__widget">
                         <div className="catalog__filter__widget__content">
                             <Button size="sm" onClick={clearFilter}>xóa bộ lọc</Button>
@@ -356,17 +360,15 @@ const Catalog = () => {
                                     let url = history.pathname;
                                     url = url.replace("page/"+params.page, "page/"+value)
                                     
-                                    history.pathname = url
-                                    params.page = value;
-                                    setCurrentPage(value)
-                                    console.log(url);
+                                    // history.pathname = url
+                                    // params.page = value;
+                                    // setCurrentPage(value)
+                                    // console.log(url);
                                     navigate(url);
                                 }
                             }
                             />
-                        </Stack>
-
-                        
+                        </Stack>                        
                     </div>
                 </div>
             </div>

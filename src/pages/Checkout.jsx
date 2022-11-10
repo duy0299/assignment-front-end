@@ -8,6 +8,7 @@ import userService from '../service/userService';
 import cartSession from '../utils/cartSession'
 import formatVND from '../utils/formatVND';
 import numberWithCommas from '../utils/numberWithCommas';
+import swalErrorAPI from '../utils/swalErrorAPI';
 import validate from '../utils/validate';
 
 
@@ -15,8 +16,8 @@ const Checkout = () => {
     const  history = useLocation();
     const  navigate = useNavigate();
     const [cartProducts, setCartProducts] = useState(cartSession.getCart())
-    const [address, setAddress] = useState(null)
-    const [note, setNote] = useState(null)
+    const [address, setAddress] = useState('')
+    const [note, setNote] = useState('')
     const [user, setUser] = useState(null)
     const [total, setTotal] = useState(0)
 
@@ -26,15 +27,7 @@ const Checkout = () => {
             setUser(response.data.result)
         })
         .catch((error)=>{
-            swal ( {
-                title: "Xin lỗi",
-                text: 'Bạn vui lòng đăng nhập trước khi thanh toán',
-                icon: "warning",
-                button: "Đăng nhập"
-              }  )
-          . then ( ( value ) =>  { 
-            navigate("/login")
-          } ) ;
+            swalErrorAPI(error)
         })
         
     },[])
@@ -45,15 +38,12 @@ const Checkout = () => {
             try {
                 orderService.insert(address, note, cartProducts)
                 .then(function (response) {
-                    console.log(response.data);
-                    swal (
-                            {
+                    swal ({
                             title: "Thành  công",
                             text: "Đơn hàng của bạn đã được xác nhận",
                             icon: "success",
                             button: "OK"
-                        }
-                    )
+                    })
                     .then ( ( value ) =>  {
                         cartSession.clearCart(); 
                         navigate("/home")
@@ -61,15 +51,7 @@ const Checkout = () => {
                 })
                 .catch(function (error) {
                     console.log(error);
-                    if(error.response){
-                        if(error.response.data.message == null){
-                            swal("Lỗi", error.response.data.result, "error");
-                        }else{
-                            swal("Lỗi", error.response.data.message, "error");
-                        }
-                    }else{
-                        swal("Lỗi", error.message, "error");
-                    }
+                    swalErrorAPI(error)
                     return null
                 })
             } catch (error) {
@@ -80,7 +62,6 @@ const Checkout = () => {
 
     const changeForm = useCallback((e)=>{
         for (const i of e.target.form) {
-            
             if(i.name === "address"){
                 setAddress(i.value)
             }
@@ -126,7 +107,7 @@ const Checkout = () => {
                     >
                         <div>
                             <label htmlFor="address">Địa chỉ</label>
-                            <input name='address'  id='address' type="text"  placeholder='điền vào địa chỉ cần gửi'/>
+                            <input name='address'  id='address' value='' type="text"  placeholder='điền vào địa chỉ cần gửi'/>
                         </div>
                         
                         <div>
